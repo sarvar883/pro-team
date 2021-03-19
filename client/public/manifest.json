@@ -1,0 +1,20 @@
+{
+  "short_name": "Pro Team",
+  "name": "App for Pro Team",
+  "icons": [
+    {
+      "src": "/img/p-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/p.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#3f51b5",
+  "background_color": "#ffffff"
+}

@@ -1,0 +1,107 @@
+.dark {
+  background-color: #212d3b;
+  color: white;
+  transition: 0.3s;
+}
+
+
+/* CALENDAR DARK THEME */
+.dark .react-calendar,
+.dark .SelectedWeekExample {
+  border: 3px solid white;
+  background-color: #212d3b;
+  color: white;
+}
+.dark .react-calendar button {
+  color: white;
+}
+.dark .react-calendar button:hover,
+.dark .SelectedWeekExample .DayPicker-Day:hover {
+  color: black;
+}
+
+
+/* FORMS */
+.dark form.form-bg {
+  border: 3px solid white;
+  background-color:  #212d3b;
+}
+
+.dark form select, 
+.dark form input, 
+.dark form textarea {
+  background-color: #666666;
+  color: white;
+}
+.dark form select option {
+  background-color: #212d3b;
+  color: white;
+}
+.dark .card {
+  border: 3px solid white;
+  background-color:  #212d3b;
+}
+.dark .invalid-feedback {
+  color: #ff1a1a;
+  font-weight: bold;
+}
+.dark ::placeholder { 
+  color: white;
+}
+
+
+/* BUTTONS */
+.dark .btn-dark,
+.dark .btn-secondary {
+  border: 3px solid white;
+}
+
+
+
+/* ORDER CARD and MODAL */
+.dark .order,
+.dark .modal-content {
+  border: 3px solid white;
+  background-color: #203246;
+  color: white;
+}
+.dark .order .text-danger,
+.dark .modal-content .text-danger {
+  color: #ff8566 !important;
+}
+.dark .order .text-success,
+.dark .modal-content .text-success {
+  color: #4dff4d !important;
+}
+
+
+
+/* NAVBAR */
+.dark nav {
+  background-color: #37577b !important;
+  border-bottom: 3px solid white;
+}
+.dark nav button, 
+.dark nav .navbar-brand,
+.dark nav a.logout,
+.dark nav a.login {
+  background-color: #203246 !important;
+  color: white !important;
+}
+.dark nav button.navbar-toggler {
+  border: 3px solid white;
+  background-color: #c2c2a3 !important;
+}
+.dark nav .nav-item .nav-link {
+  background-color: #37577b;
+  color: white !important;
+}
+
+
+
+/* TABLE */
+.dark table,
+.dark table th,
+.dark table td {
+  border: 3px solid white;
+}
