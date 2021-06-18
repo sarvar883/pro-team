@@ -1,15 +1,24 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+
 import Spinner from '../common/Spinner';
 import TextFieldGroup from '../common/TextFieldGroup';
 import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
 import isEmpty from '../../validation/is-empty';
-import advertisements from '../common/advertisements';
 
-import { getDisinfectors, getAllUsers, getCorporateClients, getOrderForEdit, editOrder } from '../../actions/orderActions';
+import {
+  getDisinfectors,
+  getAllUsers,
+  getCorporateClients,
+  getOrderForEdit,
+  editOrder
+} from '../../actions/orderActions';
 
 import orderTypes from '../common/orderTypes';
+import advertisements from '../common/advertisements';
+
+
 
 class EditOrder extends Component {
   state = {
@@ -113,7 +122,7 @@ class EditOrder extends Component {
 
       array.forEach(item => {
         arraySelectedItems.forEach(element => {
-          if (item.type === element) {
+          if (item.type === element.trim()) {
             item.selected = true;
           }
         });
@@ -192,7 +201,7 @@ class EditOrder extends Component {
         if (selectedItems === 1) {
           serviceTypeString = serviceTypeString + item.type;
         } else {
-          serviceTypeString = serviceTypeString + ',' + item.type;
+          serviceTypeString = serviceTypeString + ', ' + item.type;
         }
       }
     });
@@ -303,7 +312,7 @@ class EditOrder extends Component {
               <div className="col-md-8 m-auto">
                 <div className="card">
                   <div className="card-body">
-                    <h1 className="display-5 text-center">Редактировать Заказ</h1>
+                    <h2 className="display-5 text-center">Редактировать Заказ</h2>
                     <form onSubmit={this.onSubmit}>
                       <div className="form-group">
                         <label htmlFor="clientType">Выберите Тип Клиента:</label>
@@ -361,11 +370,11 @@ class EditOrder extends Component {
                             onChange={this.onChange}
                             required
                           />
-                          <button className="btn btn-danger mb-2" onClick={this.deleteSecondPhone}>Убрать запасной номер телефона</button>
+                          <button className="btn btn-danger mb-2" onClick={this.deleteSecondPhone}><i className="fas fa-minus-circle"></i> Убрать запасной номер телефона</button>
                         </React.Fragment>
                       ) : (
-                          <button className="btn btn-success mb-3" onClick={this.toggleSecondPhone}>Добавить другой номер</button>
-                        )}
+                        <button className="btn btn-success mb-3" onClick={this.toggleSecondPhone}><i className="fas fa-plus-circle"></i> Добавить другой номер</button>
+                      )}
 
                       <TextFieldGroup
                         label="Дата выполнения заказа"
@@ -393,8 +402,12 @@ class EditOrder extends Component {
                         </select>
                       </div> */}
 
+
+                      <div className="border-bottom"></div>
                       <label htmlFor="">Выберите тип заказа (можно выбрать несколько):</label>
                       {renderServiceTypes}
+                      <div className="border-bottom"></div>
+
 
                       <div className="form-group">
                         <label htmlFor="advertising">Откуда Узнали:</label>
@@ -408,15 +421,15 @@ class EditOrder extends Component {
                       {this.props.order.loading ? (
                         <p>Дезинфекторы загружаются...</p>
                       ) : (
-                          <div className="form-group">
-                            <label htmlFor="disinfectorId">Выберите Дезинфектора:</label>
-                            <select className="form-control" value={this.state.disinfectorId} name="disinfectorId" onChange={this.onChange} required>
-                              {disinfectorOptions.map((item, index) =>
-                                <option key={index} value={item.value}>{item.label}</option>
-                              )}
-                            </select>
-                          </div>
-                        )}
+                        <div className="form-group">
+                          <label htmlFor="disinfectorId">Выберите Дезинфектора:</label>
+                          <select className="form-control" value={this.state.disinfectorId} name="disinfectorId" onChange={this.onChange} required>
+                            {disinfectorOptions.map((item, index) =>
+                              <option key={index} value={item.value}>{item.label}</option>
+                            )}
+                          </select>
+                        </div>
+                      )}
 
 
                       <div className="form-group">
@@ -435,7 +448,7 @@ class EditOrder extends Component {
                         onChange={this.onChange}
                         required
                       />
-                      <button type="submit" className="btn btn-primary">Редактировать</button>
+                      <button type="submit" className="btn btn-primary"><i className="fas fa-edit"></i> Редактировать</button>
                     </form>
                   </div>
                 </div>

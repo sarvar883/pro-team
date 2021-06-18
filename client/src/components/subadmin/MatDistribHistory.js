@@ -78,7 +78,6 @@ class MatDistribHistory extends Component {
   };
 
 
-
   // weekly calendar
   handleDayChange = date => {
     const object = {
@@ -119,7 +118,6 @@ class MatDistribHistory extends Component {
   // end of weekly calendar
 
 
-
   render() {
     const { monthLabels, yearLabels } = getMonthAndYearLabels();
 
@@ -149,12 +147,13 @@ class MatDistribHistory extends Component {
     };
     // end of calendar
 
+
     return (
       <div className="container-fluid" >
         <div className="row">
           <div className="col-lg-4 col-md-6 mt-3">
             <form onSubmit={this.getMonthStats} className="form-bg p-2">
-              <h4 className="text-center">Раздача Материалов по месяцам</h4>
+              <h4 className="text-center">Ваши Раздачи Материалов по месяцам</h4>
               <div className="form-group">
                 <label htmlFor="year"><strong>Выберите Год:</strong></label>
                 <select name="year" className="form-control" onChange={this.onChange} required>
@@ -167,7 +166,7 @@ class MatDistribHistory extends Component {
                   {monthOptions}
                 </select>
               </div>
-              <button type="submit" className="btn btn-success mr-1 mt-1">Искать</button>
+              <button type="submit" className="btn btn-success mr-1 mt-1"><i className="fas fa-search"></i> Искать</button>
 
               <button type="button" className="btn btn-danger mr-1 mt-1" onClick={() => this.getSpecificMonthStats('current')}>Этот месяц</button>
 
@@ -177,7 +176,7 @@ class MatDistribHistory extends Component {
 
           <div className="col-lg-4 col-md-6 mt-3 ml-auto weekly-stats">
             <div className="SelectedWeekExample form-bg font-weight-bold">
-              <h4 className="text-center">Раздача Материалов по неделям</h4>
+              <h4 className="text-center">Ваши Раздачи Материалов по неделям</h4>
               <DayPicker
                 selectedDays={selectedDays}
                 showWeekNumbers
@@ -196,8 +195,8 @@ class MatDistribHistory extends Component {
         <div className="row mt-2">
           <div className="col-12">
             {this.props.subadmin.method === 'week' ?
-              <h2 className="text-center pl-3 pr-3">Недельная Раздача Материалов за <Moment format="DD/MM/YYYY">{this.state.selectedDays[0]}</Moment> - <Moment format="DD/MM/YYYY">{this.state.selectedDays[6]}</Moment></h2> :
-              <h2 className="text-center pl-3 pr-3">Месячная Раздача Материалов за {monthsNames[this.state.headingMonth]}, {this.state.headingYear}</h2>
+              <h3 className="text-center pl-3 pr-3">Ваша Недельная Раздача Материалов за <Moment format="DD/MM/YYYY">{this.state.selectedDays[0]}</Moment> - <Moment format="DD/MM/YYYY">{this.state.selectedDays[6]}</Moment></h3> :
+              <h3 className="text-center pl-3 pr-3">Ваша Месячная Раздача Материалов за {monthsNames[this.state.headingMonth]}, {this.state.headingYear}</h3>
             }
           </div>
         </div>

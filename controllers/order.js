@@ -7,6 +7,8 @@ const AddMaterial = require('../models/addMaterial');
 const validateOrderInput = require('../validation/order');
 const io = require('../socket');
 
+// const tgBot = require('../bot');
+
 
 const monthHelper = require('../utils/monthMinMax');
 const weekHelper = require('../utils/weekMinMax');
@@ -28,20 +30,20 @@ exports.getCorporateClients = (req, res) => {
 };
 
 
-exports.getAllUsers = (req, res) => {
-  User.find({ disabled: false })
-    .then(users => res.json(users))
-    .catch(err => console.log('getAllUsers ERROR', err));
-};
+// exports.getAllUsers = (req, res) => {
+//   User.find({ disabled: false })
+//     .then(users => res.json(users))
+//     .catch(err => console.log('getAllUsers ERROR', err));
+// };
 
 
-// get disinfectors and subadmins
-exports.getAllDisinfectors = (req, res) => {
-  User.find({ disabled: false })
-    .or([{ occupation: 'disinfector' }, { occupation: 'subadmin' }])
-    .then(users => res.json(users))
-    .catch(err => console.log('getAllDisinfectors ERROR', err));
-};
+// // get disinfectors and subadmins
+// exports.getAllDisinfectors = (req, res) => {
+//   User.find({ disabled: false })
+//     .or([{ occupation: 'disinfector' }, { occupation: 'subadmin' }])
+//     .then(users => res.json(users))
+//     .catch(err => console.log('getAllDisinfectors ERROR', err));
+// };
 
 
 exports.createOrder = (req, res) => {
@@ -77,6 +79,20 @@ exports.createOrder = (req, res) => {
   const order = new Order(orderObject);
   order.save()
     .then((savedOrder) => {
+      // send telegram notification
+      // tgBot.telegram.sendMessage(req.body.tgChat, `
+      //   У Вас новый заказ:
+      //   -------
+      //   Дата и Время: ${req.body.date} ${req.body.timeFrom}
+      //   Адрес: ${req.body.address}
+      //   Тип Клиента: ${req.body.clientType}
+      //   Клиент: ${req.body.client}
+      //   Телефон Клиента: ${req.body.phone}
+      //   Тип Заказа: ${req.body.typeOfService}
+      //   -------
+      //   Пожалуйста, проверьте приложение Pro Team
+      // `);
+
       if (req.body.clientType === 'corporate') {
         Client.findById(req.body.clientId)
           .then(client => {
@@ -156,6 +172,8 @@ exports.editOrder = (req, res) => {
           io.getIO().emit('editOrder', {
             order: item
           });
+          // console.log('editedOrder', item);
+          // return res.json(editedOrder);
           return res.json(item);
         });
     })
@@ -174,6 +192,23 @@ exports.deleteOrder = (req, res) => {
         orderDateFrom: req.body.object.orderDateFrom
       });
 
+
+      // delete orderId from order.nextOrdersAfterFailArray
+      Order.findOne({
+        nextOrdersAfterFailArray: req.body.object.id
+      })
+        .then(order => {
+          // let newNextOrdersArray = [...order.nextOrdersAfterFailArray] || [];
+          // newNextOrdersArray = newNextOrdersArray.filter(item => item.toString() !== req.body.object.id);
+          // order.nextOrdersAfterFailArray = newNextOrdersArray;
+          if (order && order.nextOrdersAfterFailArray) {
+            order.nextOrdersAfterFailArray = order.nextOrdersAfterFailArray.filter(item => item.toString() !== req.body.object.id);
+            order.save();
+          }
+        });
+
+
+      // delete orderId from client.orders array
       if (req.body.object.clientType === 'corporate') {
         Client.findById(req.body.object.clientId)
           .then(client => {
@@ -281,7 +316,7 @@ exports.createRepeatOrder = (req, res) => {
 };
 
 
-// get orders for logged in disinfector (only not completed orders)
+// get orders for logged in disinfector or subadmin (only not completed orders)
 exports.getOrders = (req, res) => {
   Order.find({
     disinfectorId: req.body.userId,
@@ -297,6 +332,7 @@ exports.getOrders = (req, res) => {
       }
     ]
   })
+    // .populate('clientId userCreated userAcceptedOrder')
     .populate({
       path: 'clientId',
       select: 'name'
@@ -336,6 +372,31 @@ exports.addDisinfectorComment = (req, res) => {
 exports.getOrderById = async (req, res) => {
   Order.findById(req.body.id)
     .populate('disinfectorId userCreated clientId userAcceptedOrder disinfectors.user')
+    // получаем заказ когда дезинфектор заполняет форму о выполнении заказа (OrderComplete),
+    // то мы должны получить поле 'prevFailedOrder', так как у некачественных и повторных заказов 
+    // сумма заказа не вводится
+    .populate({
+      path: 'prevFailedOrder',
+      model: 'Order',
+      select: 'dateFrom disinfectorId',
+      populate: {
+        path: 'disinfectorId',
+        model: 'User',
+        select: 'occupation name'
+      }
+    })
+    .populate({
+      // populate field 'nextOrdersAfterFailArray' and field 'disinfectorId' inside it
+      path: 'nextOrdersAfterFailArray',
+      model: 'Order',
+      // select only 2 fields
+      select: 'dateFrom disinfectorId',
+      populate: {
+        path: 'disinfectorId',
+        model: 'User',
+        select: 'occupation name'
+      }
+    })
     .exec()
     .then(order => res.json(order))
     .catch(err => {
@@ -347,13 +408,15 @@ exports.getOrderById = async (req, res) => {
 
 exports.searchOrders = async (req, res) => {
   let query;
+
   if (req.body.object.method === 'phone') {
 
     query = Order.find({
       $or: [
         { "phone": req.body.object.payload },
         { "phone": { "$regex": req.body.object.payload, "$options": "i" } }
-      ]
+      ],
+      dateFrom: { $exists: true }
     });
 
   } else if (req.body.object.method === 'contract') {
@@ -363,7 +426,8 @@ exports.searchOrders = async (req, res) => {
       $or: [
         { "contractNumber": req.body.object.payload },
         { "contractNumber": { "$regex": req.body.object.payload, "$options": "i" } }
-      ]
+      ],
+      dateFrom: { $exists: true }
     });
 
   } else if (req.body.object.method === 'address') {
@@ -372,7 +436,8 @@ exports.searchOrders = async (req, res) => {
       $or: [
         { "address": req.body.object.payload },
         { "address": { "$regex": req.body.object.payload, "$options": "i" } }
-      ]
+      ],
+      dateFrom: { $exists: true }
     });
 
   } else {
@@ -381,7 +446,17 @@ exports.searchOrders = async (req, res) => {
 
   try {
     let orders = await query
-      .populate('clientId')
+      // .populate('disinfectorId userCreated clientId userAcceptedOrder disinfectors.user')
+      // .populate('clientId')
+      // .populate('disinfectorId')
+      .populate({
+        path: 'disinfectorId',
+        select: 'name occupation'
+      })
+      .populate({
+        path: 'clientId',
+        select: 'name'
+      })
       .exec() || [];
 
     return res.json(orders);
@@ -434,6 +509,12 @@ exports.submitCompleteOrder = (req, res) => {
       } else if (order.clientType === 'individual') {
         foundOrder.cost = Number(order.cost);
       }
+
+      // if (order.paymentMethod === 'Безналичный') {
+      //   foundOrder.invoice = order.invoice;
+      // } else {
+      //   foundOrder.invoice = -1;
+      // }
 
       foundOrder.completedAt = new Date();
       return foundOrder.save();
@@ -509,6 +590,7 @@ exports.getCompleteOrdersInMonth = (req, res) => {
       { "disinfectors.user": disinfectorId }
     ]
   })
+    // .populate('disinfectorId clientId disinfectors.user')
     .populate({
       path: 'disinfectorId',
       select: 'name occupation'
@@ -523,6 +605,20 @@ exports.getCompleteOrdersInMonth = (req, res) => {
     })
     .exec()
     .then(orders => {
+
+      // NOT SURE TO DELETE THIS PIECE OF CODE
+      orders = orders.filter(item => {
+        let amongDisinfectors = 0;
+        item.disinfectors.forEach(element => {
+          if (element.user._id.toString() === disinfectorId) amongDisinfectors++;
+        });
+        if (item.disinfectorId._id.toString() === disinfectorId || amongDisinfectors > 0) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+
       return res.json(orders);
     })
     .catch(err => {
@@ -537,6 +633,7 @@ exports.getAddMaterialsEvents = (req, res) => {
 
   AddMaterial
     .find({ disinfector: id })
+    // .populate('disinfector admin')
     .populate({
       path: 'disinfector',
       select: 'name occupation'
@@ -597,9 +694,16 @@ exports.getReturnedQueries = (req, res) => {
     completed: true,
     returnedBack: true,
     returnHandled: false,
-    adminDecided: false
+    // $or: [
+    //   { adminDecided: false },
+    //   { accountantDecided: false }
+    // ]
   })
-    .populate('clientId')
+    // .populate('clientId')
+    .populate({
+      path: 'clientId',
+      select: 'name'
+    })
     .exec()
     .then(queries => res.json(queries))
     .catch(err => {

@@ -51,11 +51,11 @@ class ShowDisMatDistribs extends Component {
             <div className="card-body p-0">
               <ul className="font-bold mb-0 list-unstyled">
                 <li>Кому Вы Раздали: {item.disinfector.occupation} {item.disinfector.name}</li>
+                <li>Дата: <Moment format="DD/MM/YYYY HH:mm">{item.createdAt}</Moment></li>
                 <li>Материалы:</li>
                 <ul>
                   {renderMaterials}
                 </ul>
-                <li className="mt-1">Дата: <Moment format="DD/MM/YYYY HH:mm">{item.createdAt}</Moment></li>
               </ul>
             </div>
           </div>

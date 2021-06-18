@@ -6,6 +6,7 @@ const AddMaterial = require('../models/addMaterial');
 const ComingMaterial = require('../models/comingMaterial');
 const CurrentMaterial = require('../models/currentMaterial');
 
+// const materials = require('../client/src/components/common/materials');
 const isEmpty = require('../validation/is-empty');
 
 const monthHelper = require('../utils/monthMinMax');
@@ -102,36 +103,37 @@ exports.confirmOrderQuery = (req, res) => {
 };
 
 
-exports.getDisinfectorsAndSubadmins = (req, res) => {
-  User.find({ disabled: false })
-    .or([{ occupation: 'disinfector' }, { occupation: 'subadmin' }])
-    .then(disinfectors => res.json(disinfectors))
-    .catch(err => {
-      console.log('getDisinfectors ERROR', err);
-      return res.status(404).json(err);
-    });
-};
+// GET USERS BY ROLE
+// exports.getDisinfectorsAndSubadmins = (req, res) => {
+//   User.find({ disabled: false })
+//     .or([{ occupation: 'disinfector' }, { occupation: 'subadmin' }])
+//     .then(disinfectors => res.json(disinfectors))
+//     .catch(err => {
+//       console.log('getDisinfectors ERROR', err);
+//       return res.status(404).json(err);
+//     });
+// };
 
 
-exports.getOperators = (req, res) => {
-  User.find({ occupation: 'operator', disabled: false })
-    .then(operators => res.json(operators))
-    .catch(err => {
-      console.log('getOperators ERROR', err);
-      return res.status(404).json(err);
-    });
-};
+// exports.getOperators = (req, res) => {
+//   User.find({ occupation: 'operator', disabled: false })
+//     .then(operators => res.json(operators))
+//     .catch(err => {
+//       console.log('getOperators ERROR', err);
+//       return res.status(404).json(err);
+//     });
+// };
 
 
-exports.getOperatorsAndAdmins = (req, res) => {
-  User.find({ disabled: false })
-    .or([{ occupation: 'operator' }, { occupation: 'admin' }])
-    .then(users => res.json(users))
-    .catch(err => {
-      console.log('getOperators ERROR', err);
-      return res.status(404).json(err);
-    });
-};
+// exports.getOperatorsAndAdmins = (req, res) => {
+//   User.find({ disabled: false })
+//     .or([{ occupation: 'operator' }, { occupation: 'admin' }])
+//     .then(users => res.json(users))
+//     .catch(err => {
+//       console.log('getOperators ERROR', err);
+//       return res.status(404).json(err);
+//     });
+// };
 
 
 exports.addMaterialToDisinfector = (req, res) => {
@@ -175,7 +177,6 @@ exports.addMaterialToDisinfector = (req, res) => {
       return res.status(400).json(err);
     });
 };
-
 
 
 exports.addMaterialEvents = (req, res) => {
@@ -477,6 +478,10 @@ exports.clientById = async (req, res) => {
         .populate({
           path: 'orders',
           model: 'Order'
+          // populate: {
+          //   path: 'disinfectorId userCreated userAcceptedOrder disinfectors.user',
+          //   model: 'User'
+          // }
         });
     } else {
       query = Client.findById(req.body.id);
@@ -516,6 +521,7 @@ exports.getOrdersOfClient = async (req, res) => {
       ]
     })
       .populate('disinfectorId clientId disinfectors.user')
+      // .populate('disinfectorId userCreated clientId userAcceptedOrder disinfectors.user')
       .exec();
 
   } else if (req.body.object.client.type === 'individual') {
@@ -531,6 +537,7 @@ exports.getOrdersOfClient = async (req, res) => {
       ]
     })
       .populate('disinfectorId clientId disinfectors.user')
+      // .populate('disinfectorId userCreated clientId userAcceptedOrder disinfectors.user')
       .exec();
 
   }
@@ -574,4 +581,104 @@ exports.addNewMaterial = (req, res) => {
     });
 
   return res.json(newMat);
+};
+
+
+exports.deleteMaterialFromDB = (req, res) => {
+  const { object } = req.body;
+
+  // name of the material to delete
+  const materialToDelete = object.material;
+
+  // console.log('materialToDelete', materialToDelete);
+
+
+  // delete material from CurrentMaterial
+  CurrentMaterial.findOne()
+    .then(curMat => {
+      let materials = [...curMat.materials];
+
+      materials = materials.filter(item => item.material !== materialToDelete);
+
+      // console.log('CurrentMaterial materials', materials);
+
+      curMat.materials = [...materials];
+      curMat.save()
+    });
+
+
+  // delete material from users ('materials' array in User object)
+  User.find()
+    .then(users => {
+      let materials = [];
+
+      users.forEach(user => {
+        materials = [...user.materials];
+
+        materials = materials.filter(item => item.material !== materialToDelete);
+
+        // console.log('user materials', materials);
+
+        user.materials = [...materials];
+        user.save();
+      });
+    });
+
+  console.log('deleteMaterialFromDB done');
+
+  return res.json(object);
+};
+
+
+exports.setDisinfectorMaterials = async (req, res) => {
+  const { userId, materials } = req.body.object;
+
+  const user = await User.findById(userId);
+
+  let newMaterialsArray = [...user.materials];
+
+  materials.forEach(item => {
+
+    newMaterialsArray.forEach(element => {
+      if (item.material === element.material && item.unit === element.unit) {
+        element.amount = Number(item.amount);
+      }
+    });
+
+  });
+
+  // console.log('newMaterialsArray', newMaterialsArray);
+
+  user.materials = [...newMaterialsArray];
+  user.save();
+
+  return res.json(user);
+};
+
+
+exports.setCurrentMaterials = async (req, res) => {
+  // materials to change (coming from client)
+  const { materials } = req.body.object;
+
+  // console.log('setCurrentMaterials', materials);
+
+  const curMat = await CurrentMaterial.findOne();
+
+  let currentMaterialsArray = [...curMat.materials];
+
+  materials.forEach(item => {
+
+    currentMaterialsArray.forEach(element => {
+      if (item.material === element.material && item.unit === element.unit) {
+        element.amount = Number(item.amount);
+      }
+    });
+
+  });
+
+  curMat.materials = [...currentMaterialsArray];
+  curMat.lastUpdated = new Date();
+  curMat.save();
+
+  return res.json(currentMaterialsArray);
 };

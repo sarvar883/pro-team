@@ -34,7 +34,10 @@ const initialState = {
     userAcceptedOrder: {},
     disinfectors: [],
     prevFailedOrder: {},
-    nextOrderAfterFail: {}
+    nextOrdersAfterFailArray: [],
+
+    // we no longer use this field
+    nextOrderAfterFail: {},
   },
   repeatOrder: {
     disinfectorId: {},

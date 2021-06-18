@@ -8,33 +8,6 @@ const weekHelper = require('../utils/weekMinMax');
 const dayHelper = require('../utils/dayMinMax');
 
 
-exports.getMyOrders = (req, res) => {
-  Order.find({
-    disinfectorId: req.body.id,
-    completed: false,
-    $or: [
-      { repeatedOrder: false },
-      {
-        $and: [
-          { repeatedOrder: true },
-          { repeatedOrderDecided: true },
-          { repeatedOrderNeeded: true }
-        ]
-      }
-    ]
-  })
-    .populate('disinfectorId userCreated userAcceptedOrder clientId')
-    .exec()
-    .then(orders => {
-      return res.json(orders);
-    })
-    .catch(err => {
-      console.log('getOrders ERROR', err);
-      res.status(404).json(err);
-    });
-};
-
-
 exports.getSortedOrders = (req, res) => {
   const date = new Date(req.body.date);
   const day = date.getDate();
@@ -60,14 +33,14 @@ exports.getSortedOrders = (req, res) => {
 };
 
 
-exports.getAllDisinfectors = (req, res) => {
-  User.find({ occupation: 'disinfector', disabled: false })
-    .then(disinfectors => res.json(disinfectors))
-    .catch(err => {
-      console.log('getAllDisinfectors SUBADMIN ERROR', err);
-      return res.status(400).json(err);
-    });
-};
+// exports.getAllDisinfectors = (req, res) => {
+//   User.find({ occupation: 'disinfector', disabled: false })
+//     .then(disinfectors => res.json(disinfectors))
+//     .catch(err => {
+//       console.log('getAllDisinfectors SUBADMIN ERROR', err);
+//       return res.status(400).json(err);
+//     });
+// };
 
 
 exports.getSubadminMaterials = (req, res) => {

@@ -74,47 +74,47 @@ class EditClient extends Component {
             </div>
           </div>
         ) : (
-            <React.Fragment>
-              <div className="row mt-3">
-                <div className="col-lg-6 col-md-8 m-auto">
-                  <div className="card">
-                    <div className="card-body">
-                      <h3 className="display-5 text-center">Редактировать Клиента</h3>
-                      <p className="font-bold mb-0">Тип клиента: {this.state.type === 'corporate' ? 'Корпоративный' : 'Физический'}</p>
+          <React.Fragment>
+            <div className="row mt-3">
+              <div className="col-lg-6 col-md-8 m-auto">
+                <div className="card">
+                  <div className="card-body">
+                    <h3 className="display-5 text-center">Редактировать Клиента</h3>
+                    <p className="font-bold mb-0">Тип клиента: {this.state.type === 'corporate' ? 'Корпоративный' : 'Физический'}</p>
 
-                      <form onSubmit={this.onSubmit}>
-                        <div className="form-group">
-                          <label htmlFor="name">Имя Клиента:</label>
-                          <input type="text" name="name" className="form-control" onChange={this.onChange} value={this.state.name} required />
-                        </div>
+                    <form onSubmit={this.onSubmit}>
+                      <div className="form-group">
+                        <label htmlFor="name">Имя Клиента:</label>
+                        <input type="text" name="name" className="form-control" onChange={this.onChange} value={this.state.name} required />
+                      </div>
 
-                        {this.state.type === 'individual' && (
-                          <React.Fragment>
-                            <div className="form-group">
-                              <label htmlFor="phone">Телефон Клиента:</label>
-                              <input type="text" name="phone" className="form-control" onChange={this.onChange} value={this.state.phone} required />
-                            </div>
-                            <div className="form-group">
-                              <label htmlFor="address">Адрес Клиента:</label>
-                              <input type="text" name="address" className="form-control" onChange={this.onChange} value={this.state.address} required />
-                            </div>
-                          </React.Fragment>
-                        )}
-
-                        {this.state.type === 'corporate' && (
+                      {this.state.type === 'individual' && (
+                        <React.Fragment>
                           <div className="form-group">
-                            <label htmlFor="inn">ИНН Клиента:</label>
-                            <input type="text" name="inn" className="form-control" onChange={this.onChange} value={this.state.inn} />
+                            <label htmlFor="phone">Телефон Клиента:</label>
+                            <input type="text" name="phone" className="form-control" onChange={this.onChange} value={this.state.phone} required />
                           </div>
-                        )}
-                        <button type="submit" className="btn btn-primary">Редактировать</button>
-                      </form>
-                    </div>
+                          <div className="form-group">
+                            <label htmlFor="address">Адрес Клиента:</label>
+                            <input type="text" name="address" className="form-control" onChange={this.onChange} value={this.state.address} required />
+                          </div>
+                        </React.Fragment>
+                      )}
+
+                      {this.state.type === 'corporate' && (
+                        <div className="form-group">
+                          <label htmlFor="inn">ИНН Клиента:</label>
+                          <input type="text" name="inn" className="form-control" onChange={this.onChange} value={this.state.inn} />
+                        </div>
+                      )}
+                      <button type="submit" className="btn btn-primary"><i className="fas fa-edit"></i> Редактировать</button>
+                    </form>
                   </div>
                 </div>
               </div>
-            </React.Fragment>
-          )}
+            </div>
+          </React.Fragment>
+        )}
 
       </div>
     )

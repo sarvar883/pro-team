@@ -75,6 +75,7 @@ exports.getCompleteOrders = (req, res) => {
     completed: true,
     operatorDecided: false
   })
+    // .populate('disinfectorId clientId userCreated userAcceptedOrder')
     .populate({
       path: 'disinfectorId',
       select: 'name occupation'
@@ -83,6 +84,14 @@ exports.getCompleteOrders = (req, res) => {
       path: 'clientId',
       select: 'name'
     })
+    // .populate({
+    //   path: 'userCreated',
+    //   select: 'name occupation'
+    // })
+    // .populate({
+    //   path: 'userAcceptedOrder',
+    //   select: 'name occupation'
+    // })
     .exec()
     .then(completeOrders => res.json(completeOrders))
     .catch(err => {
@@ -95,6 +104,18 @@ exports.getCompleteOrders = (req, res) => {
 exports.getCompleteOrderById = (req, res) => {
   Order.findById(req.params.id)
     .populate('disinfectorId userCreated clientId userAcceptedOrder disinfectors.user')
+    .populate({
+      // populate field 'nextOrdersAfterFailArray' and field 'disinfectorId' inside it
+      path: 'nextOrdersAfterFailArray',
+      model: 'Order',
+      // select only 2 fields
+      select: 'dateFrom disinfectorId',
+      populate: {
+        path: 'disinfectorId',
+        model: 'User',
+        select: 'occupation name'
+      }
+    })
     .exec()
     .then(order => res.json(order))
     .catch(err => {
@@ -157,12 +178,33 @@ exports.getRepeatOrders = (req, res) => {
       { timeOfRepeat: { '$lt': timeObject.max } }
     ]
   })
-    .populate('disinfectors.user disinfectorId clientId userCreated userAcceptedOrder')
+    // .populate('disinfectors.user disinfectorId clientId userCreated userAcceptedOrder')
+    .populate({
+      path: 'disinfectors.user',
+      select: 'name occupation'
+    })
+    .populate({
+      path: 'disinfectorId',
+      select: 'name occupation'
+    })
+    .populate({
+      path: 'clientId',
+      select: 'name'
+    })
+    .populate({
+      path: 'userCreated',
+      select: 'name occupation'
+    })
+    .populate({
+      path: 'userAcceptedOrder',
+      select: 'name occupation'
+    })
     .populate({
       path: 'previousOrder',
       model: 'Order',
       populate: {
         path: 'disinfectors.user',
+        select: 'name occupation',
         model: 'User'
       }
     })
@@ -220,6 +262,7 @@ exports.getOperatorStats = (req, res) => {
     timeObject = dayHelper(req.body.object.day);
   }
 
+  // Order.find({ userAcceptedOrder: req.body.object.operatorId })
   Order.find({
     userAcceptedOrder: req.body.object.operatorId,
     $and: [
@@ -227,7 +270,27 @@ exports.getOperatorStats = (req, res) => {
       { dateFrom: { '$lt': timeObject.max } }
     ]
   })
-    .populate('disinfectorId clientId userCreated userAcceptedOrder disinfectors.user')
+    // .populate('disinfectorId clientId userCreated userAcceptedOrder disinfectors.user')
+    .populate({
+      path: 'disinfectorId',
+      select: 'name occupation'
+    })
+    .populate({
+      path: 'clientId',
+      select: 'name'
+    })
+    .populate({
+      path: 'userCreated',
+      select: 'name occupation'
+    })
+    .populate({
+      path: 'userAcceptedOrder',
+      select: 'name occupation'
+    })
+    .populate({
+      path: 'disinfectors.user',
+      select: 'name occupation'
+    })
     .exec()
     .then(orders => {
       return res.json({

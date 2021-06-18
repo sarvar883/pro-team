@@ -4,7 +4,11 @@ import { connect } from 'react-redux';
 import Spinner from '../common/Spinner';
 import Moment from 'react-moment';
 
-import { getRepeatOrders, repeatOrderNotNeeded } from '../../actions/operatorActions';
+import {
+  getRepeatOrders,
+  repeatOrderNotNeeded
+} from '../../actions/operatorActions';
+
 
 import { getWeekDays, getWeekRange } from '../common/weekFunc';
 import DayPicker from 'react-day-picker';
@@ -27,9 +31,22 @@ class RepeatOrders extends Component {
     selectedDays: []
   };
 
-  componentDidMount() {
-    // this.props.getRepeatOrders(this.props.auth.user.id);
-  }
+
+  // THIS <CACHING> NOT USED CURRENTLY BECAUSE IF REPEAT ORDER NOT NEEDED, THEN WE NEED TO DELETE THAT ORDER FROM GLOBAL STATE AND FROM DOM WHICH IS NOT YET DONE
+
+  // componentDidMount() {
+  // if (
+  //   this.props.operator.repeatOrders &&
+  //   this.props.operator.repeatOrders.length > 0
+  // ) {
+  //   this.setState({
+  //     repeatOrders: this.props.operator.repeatOrders,
+  //     headingDay: this.props.operator.repeatOrderSearchVars.headingDay,
+  //     method: this.props.operator.repeatOrderSearchVars.method,
+  //     selectedDays: this.props.operator.repeatOrderSearchVars.selectedDays
+  //   });
+  // }
+  // }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
@@ -58,8 +75,6 @@ class RepeatOrders extends Component {
   noNeed = (id) => {
     this.props.repeatOrderNotNeeded(id, this.props.history, this.props.auth.user.occupation);
   }
-
-
 
 
   // weekly calendar
@@ -109,13 +124,7 @@ class RepeatOrders extends Component {
   // end of weekly calendar
 
 
-
-
   render() {
-
-
-
-
     // weekly calender
     const { hoverRange, selectedDays } = this.state;
 
@@ -133,8 +142,6 @@ class RepeatOrders extends Component {
       selectedRangeEnd: daysAreSelected && selectedDays[6]
     };
     // end of calendar
-
-
 
 
     let renderOrders = this.state.repeatOrders.map((item, index) => {
@@ -203,7 +210,9 @@ class RepeatOrders extends Component {
               <div className="modal-content">
                 <div className="modal-body">
                   <ul className="font-bold mb-0 list-unstyled">
-                    <li>Ответственный: {item.disinfectorId.occupation} {item.disinfectorId.name}</li>
+                    {item.disinfectorId && (
+                      <li>Ответственный: {item.disinfectorId.occupation} {item.disinfectorId.name}</li>
+                    )}
 
                     {item.clientType === 'corporate' ?
                       <React.Fragment>
@@ -277,21 +286,21 @@ class RepeatOrders extends Component {
                         ) : <li className="text-danger">Бухгалтер Отклонил (<Moment format="DD/MM/YYYY HH:mm">{item.previousOrder.accountantCheckedAt}</Moment>)</li>}
                       </React.Fragment>
                     ) : (
-                        <React.Fragment>
+                      <React.Fragment>
 
-                          {item.previousOrder.adminDecided ? (
-                            <React.Fragment>
-                              <li>Админ рассмотрел заявку</li>
-                              {item.previousOrder.adminConfirmed ? (
-                                <li className="text-success">Админ Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{item.previousOrder.adminCheckedAt}</Moment>)</li>
-                              ) : <li className="text-danger">Админ Отклонил (<Moment format="DD/MM/YYYY HH:mm">{item.previousOrder.adminCheckedAt}</Moment>)</li>}
-                            </React.Fragment>
-                          ) : (
-                              <li>Бухгалтер еще не рассмотрел заявку</li>
-                            )}
+                        {item.previousOrder.adminDecided ? (
+                          <React.Fragment>
+                            <li>Админ рассмотрел заявку</li>
+                            {item.previousOrder.adminConfirmed ? (
+                              <li className="text-success">Админ Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{item.previousOrder.adminCheckedAt}</Moment>)</li>
+                            ) : <li className="text-danger">Админ Отклонил (<Moment format="DD/MM/YYYY HH:mm">{item.previousOrder.adminCheckedAt}</Moment>)</li>}
+                          </React.Fragment>
+                        ) : (
+                          <li>Бухгалтер еще не рассмотрел заявку</li>
+                        )}
 
-                        </React.Fragment>
-                      )}
+                      </React.Fragment>
+                    )}
 
 
 
@@ -378,7 +387,7 @@ class RepeatOrders extends Component {
                 <label htmlFor="day"><strong>Выберите День:</strong></label>
                 <input type="date" name="day" className="form-control" onChange={this.onChange} required />
               </div>
-              <button type="submit" className="btn btn-primary">Искать</button>
+              <button type="submit" className="btn btn-primary"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
         </div>

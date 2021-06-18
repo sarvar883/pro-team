@@ -135,7 +135,7 @@ class AddClient extends Component {
                       />
                     </React.Fragment>
                   ) : ''}
-                  <button type="submit" className="btn btn-success">Добавить</button>
+                  <button type="submit" className="btn btn-success"><i className="fas fa-plus-circle"></i> Добавить</button>
                 </form>
               </div>
             </div>

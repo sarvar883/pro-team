@@ -122,7 +122,7 @@ class ClientList extends Component {
     let renderClients = clients.map((client, index) =>
       <tr key={index}>
         <td>{client.name} {client.type === 'corporate' && client.inn ? `(ИНН: ${client.inn})` : ''}</td>
-        <td><Link to={`/client/${client._id}`} className="btn btn-primary pl-1 pr-1">Подробнее</Link></td>
+        <td><Link to={`/client/${client._id}`} className="btn btn-primary pl-1 pr-1"><i className="fas fa-comment-dots"></i> Подробнее</Link></td>
         <td>{client.type === 'corporate' ? 'Корп.' : 'Физ.'}</td>
         <td>{client.phone ? client.phone : '--'}</td>
         <td>{client.address ? client.address : '--'}</td>
@@ -164,7 +164,7 @@ class ClientList extends Component {
                 onChange={this.onChange}
                 required
               />
-              <button type="submit" className="btn btn-success">Искать</button>
+              <button type="submit" className="btn btn-success"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 
@@ -179,7 +179,7 @@ class ClientList extends Component {
                 onChange={this.onChange}
                 required
               />
-              <button type="submit" className="btn btn-primary">Искать</button>
+              <button type="submit" className="btn btn-primary"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 
@@ -194,7 +194,7 @@ class ClientList extends Component {
                 onChange={this.onChange}
                 required
               />
-              <button type="submit" className="btn btn-dark">Искать</button>
+              <button type="submit" className="btn btn-dark"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 
@@ -209,17 +209,29 @@ class ClientList extends Component {
                 onChange={this.onChange}
                 required
               />
-              <button type="submit" className="btn btn-warning">Искать</button>
+              <button type="submit" className="btn btn-warning"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 
           <div className="col-lg-4 col-md-6 mt-2">
-            <button type="submit" className="btn btn-danger" onClick={() => this.showCorporate()}>Корпоративные клиенты</button>
+            <button type="submit" className="btn btn-danger" onClick={() => this.showCorporate()}><i className="fas fa-building"></i> Корпоративные клиенты</button>
           </div>
+
+          {/* <div className="col-lg-4 col-md-6 mt-3">
+            <form onSubmit={this.searchAll}>
+              <button type="submit" className="btn btn-info">Посмотреть все клиенты</button>
+            </form>
+          </div> */}
         </div>
 
         <div className="row mt-3">
           <div className="col-12">
+            {/* {this.state.method === 'name' ? <h2 className="text-center">Результаты поиска клиентов по имени "{this.state.headingText}"</h2> : ''}
+
+            {this.state.method === 'phone' ? <h2 className="text-center">Результаты поиска клиентов по номеру телефона "{this.state.headingText}"</h2> : ''}
+
+            {this.state.method === 'address' ? <h2 className="text-center">Результаты поиска клиентов по адресу "{this.state.headingText}"</h2> : ''} */}
+
             {this.state.method !== '' && (
               <React.Fragment>
                 {this.state.method === 'all' ?

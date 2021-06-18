@@ -88,16 +88,22 @@ class ShowOrderInfo extends Component {
                   error={errors.disinfectorComment}
                 />
                 <div className="btn-group">
-                  <button type="submit" className="btn btn-success mr-3">Добавить</button>
-                  <button type="button" className="btn btn-warning" onClick={this.toggleAddComment}>Закрыть</button>
+                  <button type="submit" className="btn btn-success mr-3"><i className="fas fa-plus-circle"></i> Добавить</button>
+                  <button type="button" className="btn btn-warning" onClick={this.toggleAddComment}><i className="fas fa-window-close"></i> Закрыть</button>
                 </div>
               </form>
             ) : (
-                <button type="button" className="btn btn-success d-block" onClick={this.toggleAddComment}>Добавить Комментарий</button>
-              )}
+              <button type="button" className="btn btn-success d-block" onClick={this.toggleAddComment}><i className="fas fa-comment-dots"></i> Добавить Комментарий</button>
+            )}
 
             {currentTime.getTime() > new Date(orderObject.dateFrom).getTime() ? (
-              <Link to={`/subadmin/order-complete-form/${orderObject._id}`} className="btn btn-primary mt-3">Форма О Выполнении</Link>
+              <Link
+                // to={`/subadmin/order-complete-form/${orderObject._id}`}
+                to={`/order-complete-form/${orderObject._id}`}
+                className="btn btn-primary mt-3"
+              >
+                <i className="fab fa-wpforms"></i> Форма О Выполнении
+              </Link>
             ) : ''}
 
           </div>

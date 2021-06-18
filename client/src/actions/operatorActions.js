@@ -8,6 +8,7 @@ import {
   DELETE_QUERY_FROM_STATE,
   GOT_STATS_FOR_OPERATOR,
   GET_REPEAT_ORDERS,
+  SET_REPEAT_ORDER_SEARCH_VARS,
   SET_LOADING_SORTED_ORDERS,
   SET_LOADING_COMPLETE_ORDERS,
   SET_LOADING_OPERATOR_STATS
@@ -110,6 +111,17 @@ export const getOperatorStats = (month, year) => (dispatch) => {
 
 export const getRepeatOrders = (object) => (dispatch) => {
   dispatch(setLoadingSortedOrders());
+
+  // set repeat order search Vars
+  dispatch({
+    type: SET_REPEAT_ORDER_SEARCH_VARS,
+    payload: {
+      method: object.type,
+      headingDay: object.day || '',
+      selectedDays: object.days || []
+    }
+  });
+
   axios.post('/operator/get-repeat-orders', { object })
     .then(res =>
       dispatch({

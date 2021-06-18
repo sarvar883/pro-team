@@ -69,7 +69,7 @@ class DisinfQueries extends Component {
       month: this.state.month,
       year: this.state.year
     };
-
+    // this.props.getCompleteOrdersInMonth(this.state.month, this.state.year, this.props.auth.user.id);
     this.props.getCompleteOrdersInMonth(object);
     this.setState({
       method: 'month',
@@ -99,7 +99,7 @@ class DisinfQueries extends Component {
       type: 'week',
       days: getWeekDays(getWeekRange(date).from)
     };
-
+    // this.props.getCompleteOrdersInMonth(this.props.auth.user.id, getWeekDays(getWeekRange(date).from));
     this.props.getCompleteOrdersInMonth(object);
 
     this.setState({
@@ -126,6 +126,7 @@ class DisinfQueries extends Component {
       type: 'week',
       days: getWeekDays(getWeekRange(days[0]).from)
     };
+    // this.props.getWeekStats(this.props.auth.user.id, getWeekDays(getWeekRange(days[0]).from));
     this.props.getCompleteOrdersInMonth(object);
 
     this.setState({
@@ -138,6 +139,13 @@ class DisinfQueries extends Component {
 
 
   render() {
+    // const yearsOptions = years.map((year, index) =>
+    //   <option value={year.value} key={index}>{year.label}</option>
+    // );
+    // const monthOptions = months.map((month, index) =>
+    //   <option value={month.value} key={index}>{month.label}</option>
+    // );
+
     // weekly calender
     const { hoverRange, selectedDays } = this.state;
 
@@ -156,7 +164,6 @@ class DisinfQueries extends Component {
     };
     // end of calendar
 
-
     return (
       <div className="container-fluid">
         <div className="row">
@@ -166,6 +173,25 @@ class DisinfQueries extends Component {
         </div>
 
         <div className="row">
+          {/* <div className="col-lg-4 col-md-6 mt-3">
+            <form onSubmit={this.onSubmit} className="form-bg p-2">
+              <h4 className="text-center">Отправленные Запросы за месяц</h4>
+              <div className="form-group">
+                <label htmlFor="year"><strong>Выберите Год:</strong></label>
+                <select name="year" className="form-control" onChange={this.onChange} required>
+                  {yearsOptions}
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="month"><strong>Выберите Месяц:</strong></label>
+                <select name="month" className="form-control" onChange={this.onChange} required>
+                  {monthOptions}
+                </select>
+              </div>
+              <button type="submit" className="btn btn-success"><i className="fas fa-search"></i> Искать</button>
+            </form>
+          </div> */}
+
           <div className="col-lg-4 col-md-6 mt-3">
             <form onSubmit={this.getDayStats} className="form-bg p-2">
               <h4 className="text-center">Отправленные Запросы за день</h4>
@@ -173,7 +199,7 @@ class DisinfQueries extends Component {
                 <label htmlFor="day"><strong>Выберите День:</strong></label>
                 <input type="date" name="day" className="form-control" onChange={this.onChange} required />
               </div>
-              <button type="submit" className="btn btn-primary">Искать</button>
+              <button type="submit" className="btn btn-primary"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 

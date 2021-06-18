@@ -3,8 +3,10 @@ import {
   GET_ORDER_BY_ID,
   GET_SORTED_ORDERS_SUBADMIN,
   ALL_DISINFECTORS,
+
   GET_ALL_DISINFECTORS_FOR_ADMIN, // from admin's action
   SET_LOADING_DISINFECTORS, // from admin's action
+
   GET_ALL_DISINFECTORS,
   SUBADMIN_ADDS_MATERIAL,
   SUBADMIN_MAT_COM_HISTORY,
@@ -25,7 +27,10 @@ const initialState = {
     userCreated: {},
     userAcceptedOrder: {},
     prevFailedOrder: {},
-    nextOrderAfterFail: {}
+    nextOrdersAfterFailArray: [],
+
+    // we no longer use this field
+    nextOrderAfterFail: {},
   },
   disinfectors: [],
   sortedOrders: [],
@@ -109,7 +114,7 @@ export default function (state = initialState, action) {
         loading: false
       };
 
-    // get all disinfectors AND subadmins(for subadmin)
+    // get all disinfectors AND subadmins (for subadmin)
     case GET_ALL_DISINFECTORS_FOR_ADMIN: // from admin's action
       return {
         ...state,

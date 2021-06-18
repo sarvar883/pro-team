@@ -19,8 +19,14 @@ import {
 
 export const getAllUsers = () => (dispatch) => {
   dispatch(setLoadingUsers());
-  axios
-    .get('/chat/get-all-users')
+
+  const object = {
+    method: 'all',
+    roles: []
+  };
+
+  // axios.get('/chat/get-all-users')
+  axios.post('/get-users', { object })
     .then(users =>
       dispatch({
         type: GET_ALL_USERS,

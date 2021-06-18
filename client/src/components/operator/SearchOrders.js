@@ -5,10 +5,12 @@ import Spinner from '../common/Spinner';
 import Moment from 'react-moment';
 
 import TextFieldGroup from '../common/TextFieldGroup';
-import guaranteeExpired from '../../utils/guaranteeExpired';
+// import guaranteeExpired from '../../utils/guaranteeExpired';
+import ClientNotSatisfiedButton from '../common/ClientNotSatisfiedButton';
 
 import { searchOrders, deleteOrder } from '../../actions/orderActions';
 import { adminConfirmsOrderQuery } from '../../actions/adminActions';
+
 
 class SearchOrders extends Component {
   state = {
@@ -99,14 +101,15 @@ class SearchOrders extends Component {
     window.location.reload();
   }
 
-  goToAddNewForm = (item) => {
-    this.props.history.push(`/fail/add-new/${item._id}`, {
-      pathname: `/fail/add-new/${item._id}`,
-      state: { order: item, shouldLoadOrder: true }
-    });
-  };
+  // goToAddNewForm = (item) => {
+  //   this.props.history.push(`/fail/add-new/${item._id}`, {
+  //     pathname: `/fail/add-new/${item._id}`,
+  //     state: { order: item, shouldLoadOrder: true }
+  //   });
+  // };
 
   render() {
+    console.log('orders', this.state.orders);
     let renderOrders = this.state.orders.map((item, index) => {
       let consumptionArray = [];
       item.disinfectors.forEach(thing => {
@@ -115,6 +118,7 @@ class SearchOrders extends Component {
           consumption: thing.consumption
         });
       });
+
 
       // let consumptionRender = consumptionArray.map((element, number) =>
       //   <li key={number}>
@@ -125,18 +129,29 @@ class SearchOrders extends Component {
       //   </li>
       // );
 
+
       return (
         <div className="col-lg-4 col-md-6" key={index}>
           <div className="card order mt-2">
             <div className="card-body p-0">
               <ul className="font-bold mb-0 list-unstyled">
-                {/* <li>Ответственный: {item.disinfectorId.occupation} {item.disinfectorId.name}</li> */}
+                {item.prevFailedOrder && (
+                  <li><h4><i className="fas fas fa-exclamation"></i> Повторный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                )}
 
-                {item.failed && <li className="text-danger">Это некачественный заказ</li>}
+                {item.failed && (
+                  <li><h4><i className="fas fas fa-exclamation"></i> Некачественный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                )}
 
-                {item.completed ? (
+                {item.disinfectorId && (
+                  <li>Ответственный: {item.disinfectorId.occupation} {item.disinfectorId.name}</li>
+                )}
+
+                {/* {item.completed ? (
                   <li>Заказ Выполнен</li>
-                ) : <li>Заказ еще Не Выполнен</li>}
+                ) : <li>Заказ еще Не Выполнен</li>} */}
+
+                {!item.completed && <li>Заказ еще Не Выполнен</li>}
 
                 {item.completed && item.operatorDecided ? (
                   <React.Fragment>
@@ -166,21 +181,21 @@ class SearchOrders extends Component {
                     ) : <li className="text-danger">Бухгалтер Отклонил (<Moment format="DD/MM/YYYY HH:mm">{item.accountantCheckedAt}</Moment>)</li>}
                   </React.Fragment>
                 ) : (
-                    <React.Fragment>
+                  <React.Fragment>
 
-                      {item.adminDecided ? (
-                        <React.Fragment>
-                          <li>Админ рассмотрел заявку</li>
-                          {item.adminConfirmed ? (
-                            <li className="text-success">Админ Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{item.adminCheckedAt}</Moment>)</li>
-                          ) : <li className="text-danger">Админ Отклонил (<Moment format="DD/MM/YYYY HH:mm">{item.adminCheckedAt}</Moment>)</li>}
-                        </React.Fragment>
-                      ) : (
-                          <li>Бухгалтер еще не рассмотрел заявку</li>
-                        )}
+                    {item.adminDecided ? (
+                      <React.Fragment>
+                        <li>Админ рассмотрел заявку</li>
+                        {item.adminConfirmed ? (
+                          <li className="text-success">Админ Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{item.adminCheckedAt}</Moment>)</li>
+                        ) : <li className="text-danger">Админ Отклонил (<Moment format="DD/MM/YYYY HH:mm">{item.adminCheckedAt}</Moment>)</li>}
+                      </React.Fragment>
+                    ) : (
+                      <li>Бухгалтер еще не рассмотрел заявку</li>
+                    )}
 
-                    </React.Fragment>
-                  )}
+                  </React.Fragment>
+                )}
 
 
                 {/* {item.clientType === 'corporate' && item.paymentMethod === 'notCash' && !item.accountantDecided ? <li>Бухгалтер еще не рассмотрел заявку</li> : ''}
@@ -267,7 +282,7 @@ class SearchOrders extends Component {
                   <li>Номер договора: {item.contractNumber ? item.contractNumber : '--'}</li>
                 ) : ''}
 
-                <li>Срок гарантии (в месяцах): {item.guarantee ? item.guarantee : '--'}</li>
+                <li>Срок гарантии (в месяцах): {item.guarantee}</li>
                 <li>Комментарии: {item.comment ? item.comment : '--'}</li>
                 <li>Комментарии Дезинфектора: {item.disinfectorComment ? item.disinfectorComment : '--'}</li>
 
@@ -298,14 +313,24 @@ class SearchOrders extends Component {
                   </React.Fragment>
                 ) : ''} */}
 
-                {item.completed ?
-                  <Link to={`/order-full-details/${item._id}`} className="btn btn-primary mt-2 mr-2">Подробнее</Link>
-                  :
-                  <Link to={`/order-details/${item._id}`} className="btn btn-primary mt-2 mr-2">Подробнее</Link>
-                }
+                {item.completed ? (
+                  <Link
+                    to={`/order-full-details/${item._id}`}
+                    className="btn btn-primary mt-3 mr-2"
+                  >
+                    <i className="fas fa-info"></i> Подробнее
+                  </Link>
+                ) : (
+                  <Link
+                    to={`/order-details/${item._id}`}
+                    className="btn btn-primary mt-3 mr-2"
+                  >
+                    <i className="fas fa-info"></i> Подробнее
+                  </Link>
+                )}
 
 
-                {this.props.auth.user.occupation === 'admin' && item.completed && !item.adminDecided ? (
+                {/* {this.props.auth.user.occupation === 'admin' && item.completed && !item.adminDecided ? (
                   <React.Fragment>
                     {item.clientType === 'individual' || (item.clientType === 'corporate' && item.paymentMethod === 'cash') ? (
                       <div className="btn-group">
@@ -317,14 +342,32 @@ class SearchOrders extends Component {
                       </div>
                     ) : ''}
                   </React.Fragment>
+                ) : ''} */}
+
+
+                {this.props.auth.user.occupation === 'accountant' &&
+                  item.completed &&
+                  !item.accountantDecided &&
+                  !item.adminDecided ? (
+                  // item.clientType === 'corporate' && 
+                  // item.paymentMethod === 'notCash' ? (
+                  <Link
+                    to={`/accountant/order-confirm/${item._id}`}
+                    className="btn btn-dark mt-3 mr-2"
+                  >
+                    <i className="fab fa-wpforms"></i> Перейти на страницу подтверждения
+                  </Link>
                 ) : ''}
 
-                {this.props.auth.user.occupation === 'accountant' && item.completed && !item.accountantDecided && item.clientType === 'corporate' && item.paymentMethod === 'notCash' ? (
-                  <Link to={`/accountant/order-confirm/${item._id}`} className="btn btn-dark mt-2 mr-2">Перейти на страницу подтверждения</Link>
-                ) : ''}
 
-                {this.props.auth.user.occupation === 'operator' && item.completed && !item.operatorDecided ? (
-                  <Link to={`/order-confirm/${item._id}`} className="btn btn-dark mt-2 mr-2">Перейти на страницу подтверждения</Link>
+                {this.props.auth.user.occupation === 'operator' &&
+                  item.completed && !item.operatorDecided ? (
+                  <Link
+                    to={`/order-confirm/${item._id}`}
+                    className="btn btn-dark mt-3 mr-2"
+                  >
+                    <i className="fab fa-wpforms"></i> Перейти на страницу подтверждения
+                  </Link>
                 ) : ''}
 
                 {/* <button className="btn btn-danger" onClick={() => {
@@ -338,18 +381,23 @@ class SearchOrders extends Component {
                 }}>Удалить</button> */}
 
                 {/* show клиент недоволен button */}
-                {['admin', 'subadmin', 'operator'].includes(this.props.auth.user.occupation) &&
+                {/* {['admin', 'accountant', 'subadmin', 'operator'].includes(this.props.auth.user.occupation) &&
                   item.completed && !item.failed && item.guarantee &&
-                  !guaranteeExpired(item.completedAt, item.guarantee) ?
-                  (
-                    <div className="btn-group">
-                      <button
-                        className="btn btn-secondary mt-2 mr-2"
-                        onClick={() => this.goToAddNewForm(item)}
-                      >Клиент Недоволен</button>
-                    </div>
-                  ) : ''
-                }
+                  !guaranteeExpired(item.completedAt, item.guarantee) ? (
+
+                  <div className="btn-group">
+                    <button
+                      className="btn btn-secondary mt-2 mr-2"
+                      onClick={() => this.goToAddNewForm(item)}
+                    >Клиент Недоволен</button>
+                  </div>
+
+                ) : ''} */}
+
+                <ClientNotSatisfiedButton
+                  order={item}
+                  shouldLoadOrder={true}
+                />
 
               </ul>
             </div>
@@ -369,7 +417,7 @@ class SearchOrders extends Component {
 
           <div className="col-lg-4 col-md-6 mt-2">
             <form onSubmit={this.searchByAddress} className="form-bg p-1">
-              <h4 className="text-center mb-0">Поиск по адресу</h4>
+              <h4 className="text-center mb-0">Поиск по адресу <i className="fas fa-map-marker"></i></h4>
               <TextFieldGroup
                 type="text"
                 placeholder="Адрес"
@@ -378,13 +426,13 @@ class SearchOrders extends Component {
                 onChange={this.onChange}
                 required
               />
-              <button type="submit" className="btn btn-success">Искать</button>
+              <button type="submit" className="btn btn-success"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 
           <div className="col-lg-4 col-md-6 mt-2">
             <form onSubmit={this.searchByPhone} className="form-bg p-1">
-              <h4 className="text-center mb-0">Поиск по номеру телефона</h4>
+              <h4 className="text-center mb-0">Поиск по номеру телефона <i className="fas fa-phone"></i></h4>
               <TextFieldGroup
                 type="text"
                 placeholder="Номер Телефона"
@@ -393,13 +441,13 @@ class SearchOrders extends Component {
                 onChange={this.onChange}
                 required
               />
-              <button type="submit" className="btn btn-dark">Искать</button>
+              <button type="submit" className="btn btn-dark"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 
           <div className="col-lg-4 col-md-6 mt-2">
             <form onSubmit={this.searchByContract} className="form-bg p-1">
-              <h4 className="text-center mb-0">Поиск по номеру договора</h4>
+              <h4 className="text-center mb-0">Поиск по номеру договора <i className="fas fa-file-alt"></i></h4>
               <TextFieldGroup
                 type="text"
                 placeholder="Номер Договора"
@@ -408,7 +456,7 @@ class SearchOrders extends Component {
                 onChange={this.onChange}
                 required
               />
-              <button type="submit" className="btn btn-primary">Искать</button>
+              <button type="submit" className="btn btn-primary"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 
@@ -416,11 +464,17 @@ class SearchOrders extends Component {
 
         <div className="row mt-3">
           <div className="col-12">
-            {this.state.method === 'phone' ? <h2 className="text-center">Результаты поиска заказов по номеру телефона "{this.state.headingText}"</h2> : ''}
+            {this.state.method === 'phone' && (
+              <h2 className="text-center">Результаты поиска заказов по номеру телефона "{this.state.headingText}"</h2>
+            )}
 
-            {this.state.method === 'address' ? <h2 className="text-center">Результаты поиска заказов по адресу "{this.state.headingText}"</h2> : ''}
+            {this.state.method === 'address' && (
+              <h2 className="text-center">Результаты поиска заказов по адресу "{this.state.headingText}"</h2>
+            )}
 
-            {this.state.method === 'contract' ? <h2 className="text-center">Результаты поиска заказов по номеру договора "{this.state.headingText}"</h2> : ''}
+            {this.state.method === 'contract' && (
+              <h2 className="text-center">Результаты поиска заказов по номеру договора "{this.state.headingText}"</h2>
+            )}
           </div>
         </div>
 
@@ -431,12 +485,12 @@ class SearchOrders extends Component {
             </div>
           </div>
         ) : (
-            <div className="row mt-3">
-              {this.state.headingText.length > 0 && this.props.order.orders.length === 0 ? (
-                <h2 className="m-auto">Заказы не найдены</h2>
-              ) : renderOrders}
-            </div>
-          )}
+          <div className="row mt-3">
+            {this.state.headingText.length > 0 && this.props.order.orders.length === 0 ? (
+              <h2 className="m-auto">Заказы не найдены</h2>
+            ) : renderOrders}
+          </div>
+        )}
       </div>
     )
   }

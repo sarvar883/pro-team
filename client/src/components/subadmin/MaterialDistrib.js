@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import Spinner from '../common/Spinner';
 
 import materials from '../common/materials';
+import removeZeros from '../../utils/removeZerosMat';
 
 import { getSubadminMaterials, addMaterialToDisinfector } from '../../actions/subadminActions';
 import { getAllDisinfectorsAndSubadmins } from '../../actions/adminActions';
@@ -120,12 +121,17 @@ class MaterialDistrib extends Component {
   }
 
   render() {
-    let renderSubadminMaterials = this.state.currentMaterials.map((item, index) =>
+    // current materials without zeros
+    const currentMaterials = removeZeros([...this.state.currentMaterials]);
+
+    let renderSubadminMaterials = currentMaterials.map((item, index) =>
       <li key={index}>{item.material}: {item.amount} {item.unit}</li>
     );
 
     let showDisinfectors = this.props.subadmin.disinfectors.map((item, index) => {
-      let disinfectorMaterials = item.materials.map((material, number) =>
+      let matArray = removeZeros([...item.materials]);
+
+      let disinfectorMaterials = matArray.map((material, number) =>
         <li key={number}>{material.material}: {material.amount} {material.unit}</li>
       );
 
@@ -180,7 +186,7 @@ class MaterialDistrib extends Component {
             required
           />
         </div>
-        <hr />
+        <div className="border-bottom-red"></div>
       </React.Fragment>
     );
 
@@ -202,7 +208,7 @@ class MaterialDistrib extends Component {
           <div className="col-lg-6 col-md-8 mx-auto">
             <div className="card order mt-2">
               <div className="card-body p-0">
-                <h2 className="text-center">У вас имеется материалов</h2>
+                <h3 className="text-center">У вас имеется материалов</h3>
                 <ul className="font-bold mb-0 list-unstyled">
                   {renderSubadminMaterials}
                 </ul>
@@ -244,10 +250,14 @@ class MaterialDistrib extends Component {
 
                   <label htmlFor="consumption">Выберите Материал и Количество:</label>
                   {renderMaterials}
-                  {this.state.array.length < materials.length ? <button className="btn btn-primary mr-2" onClick={this.addMaterial}>Добавить Материал</button> : ''}
-                  {this.state.array.length === 1 ? '' : <button className="btn btn-danger" onClick={this.deleteMaterial}>Удалить последний материал</button>}
-                  <hr /><hr />
-                  <button type="submit" className="btn btn-success">Добавить Пользователю</button>
+
+                  {this.state.array.length < materials.length ? <button className="btn btn-primary mr-2" onClick={this.addMaterial}><i className="fas fa-plus"></i> Добавить Материал</button> : ''}
+
+                  {this.state.array.length === 1 ? '' : <button className="btn btn-danger" onClick={this.deleteMaterial}><i className="fas fa-trash-alt"></i> Удалить последний материал</button>}
+
+                  <div className="border-bottom"></div>
+
+                  <button type="submit" className="btn btn-success"><i className="fas fa-plus-circle"></i> Добавить Пользователю</button>
                 </form>
               </div>
             </div>

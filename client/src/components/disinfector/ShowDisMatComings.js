@@ -51,11 +51,11 @@ class ShowDisMatComings extends Component {
             <div className="card-body p-0">
               <ul className="font-bold mb-0 list-unstyled">
                 <li>Кто Вам Раздал: {item.admin.occupation} {item.admin.name}</li>
+                <li>Дата: <Moment format="DD/MM/YYYY HH:mm">{item.createdAt}</Moment></li>
                 <li>Материалы:</li>
                 <ul>
                   {renderMaterials}
                 </ul>
-                <li className="mt-1">Дата: <Moment format="DD/MM/YYYY HH:mm">{item.createdAt}</Moment></li>
               </ul>
             </div>
           </div>

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import Calendar from 'react-calendar';
 import { connect } from 'react-redux';
+
+import Calendar from 'react-calendar';
 import Moment from 'react-moment';
 import Spinner from '../common/Spinner';
 import { Swipeable } from 'react-swipeable';
@@ -20,10 +21,13 @@ class Subadmin extends Component {
   };
 
   onChange = (date) => {
-    this.setState({
-      date: date
-    });
-    this.props.getSortedOrders(date);
+    // do not send another request if orders are already being loaded
+    if (!this.props.subadmin.loadingSortedOrders) {
+      this.setState({
+        date: date
+      });
+      this.props.getSortedOrders(date);
+    }
   };
 
   onSwiped = (direction) => {
@@ -44,15 +48,20 @@ class Subadmin extends Component {
         date: newDate
       });
     }
+
     this.props.getSortedOrders(this.state.date);
   };
 
-  today = (e) => {
+  today = () => {
     let newDate = new Date();
-    this.setState({
-      date: newDate
-    });
-    this.props.getSortedOrders(newDate);
+
+    // do not send another request if orders are already being loaded
+    if (!this.props.subadmin.loadingSortedOrders) {
+      this.setState({
+        date: newDate
+      });
+      this.props.getSortedOrders(newDate);
+    }
   };
 
   render() {
@@ -62,7 +71,7 @@ class Subadmin extends Component {
       <div className="container-fluid mt-1">
         <div className="row">
           <div className="col-12">
-            <h2 className="text-center">Страница СубАдмина {this.props.auth.user.name}</h2>
+            <h2 className="text-center">Страница Субадмина {this.props.auth.user.name}</h2>
           </div>
         </div>
 
@@ -74,11 +83,16 @@ class Subadmin extends Component {
                 value={this.state.date}
               />
 
-              <button className="btn btn-dark mt-3" onClick={() => this.today()}>Показать Сегодня</button>
+              <button
+                className="btn btn-dark mt-3"
+                onClick={() => this.today()}
+              >
+                <i className="fas fa-calendar-day"></i> Показать Сегодня
+              </button>
             </div>
           </div>
           <div className="col-lg-9">
-            <h1 className="text-center">Заявки на <Moment format="DD/MM/YYYY">{this.state.date}</Moment></h1>
+            <h2 className="text-center">Заявки на <Moment format="DD/MM/YYYY">{this.state.date}</Moment></h2>
 
             {loadingSortedOrders ? <Spinner /> : (
               <Swipeable

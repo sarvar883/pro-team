@@ -153,9 +153,9 @@ class SubMatComHist extends Component {
     return (
       <div className="container-fluid" >
         <div className="row">
-          <div className="col-lg-4 col-md-6">
-            <h2 className="text-center">Ваш Приход Материалов по месяцам</h2>
-            <form onSubmit={this.getMonthStats}>
+          <div className="col-lg-4 col-md-6 mt-3">
+            <form onSubmit={this.getMonthStats} className="form-bg p-2">
+              <h4 className="text-center">Ваши Приходы Материалов по месяцам</h4>
               <div className="form-group">
                 <label htmlFor="year"><strong>Выберите Год:</strong></label>
                 <select name="year" className="form-control" onChange={this.onChange} required>
@@ -168,7 +168,7 @@ class SubMatComHist extends Component {
                   {monthOptions}
                 </select>
               </div>
-              <button type="submit" className="btn btn-success mr-1 mt-1">Искать</button>
+              <button type="submit" className="btn btn-success mr-1 mt-1"><i className="fas fa-search"></i> Искать</button>
 
               <button type="button" className="btn btn-danger mr-1 mt-1" onClick={() => this.getSpecificMonthStats('current')}>Этот месяц</button>
 
@@ -176,9 +176,9 @@ class SubMatComHist extends Component {
             </form>
           </div>
 
-          <div className="col-lg-4 col-md-6 ml-auto weekly-stats">
-            <div className="SelectedWeekExample">
-              <h2 className="text-center">Приход Материалов по неделям</h2>
+          <div className="col-lg-4 col-md-6 ml-auto weekly-stats mt-3">
+            <div className="SelectedWeekExample form-bg font-weight-bold">
+              <h4 className="text-center">Ваши Приходы Материалов по неделям</h4>
               <DayPicker
                 selectedDays={selectedDays}
                 showWeekNumbers
@@ -197,9 +197,9 @@ class SubMatComHist extends Component {
         <div className="row mt-2">
           <div className="col-12">
             {this.props.subadmin.method === 'week' ?
-              <h2 className="text-center pl-3 pr-3">Ваш Недельный Приход Материалов за <Moment format="DD/MM/YYYY">{this.state.selectedDays[0]}</Moment> - <Moment format="DD/MM/YYYY">{this.state.selectedDays[6]}</Moment></h2> :
+              <h3 className="text-center pl-3 pr-3">Ваш Недельный Приход Материалов за <Moment format="DD/MM/YYYY">{this.state.selectedDays[0]}</Moment> - <Moment format="DD/MM/YYYY">{this.state.selectedDays[6]}</Moment></h3> :
 
-              <h2 className="text-center pl-3 pr-3">Ваш Месячный Приход Материалов за {monthsNames[this.state.headingMonth]}, {this.state.headingYear}</h2>
+              <h3 className="text-center pl-3 pr-3">Ваш Месячный Приход Материалов за {monthsNames[this.state.headingMonth]}, {this.state.headingYear}</h3>
             }
           </div>
         </div>

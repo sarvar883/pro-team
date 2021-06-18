@@ -42,8 +42,8 @@ class SubadmOrders extends Component {
       <React.Fragment>
         <div className="container">
           <div className="row">
-            <div className="col-12">
-              <h1 className="text-center">СубАдмин {this.props.auth.user.name}</h1>
+            <div className="col-12 mt-2">
+              <h2 className="text-center">Страница Субaдмина {this.props.auth.user.name}</h2>
             </div>
           </div>
 
@@ -56,7 +56,7 @@ class SubadmOrders extends Component {
               <div className="col-md-6 mx-auto mt-3">
                 <div className="card order">
                   <div className="card-body p-0">
-                    <ul className="font-bold mb-0 pl-3">
+                    <ul className="font-bold mb-0 list-unstyled">
                       {currentMaterials}
                     </ul>
                   </div>

@@ -17,14 +17,27 @@ class Operator extends Component {
   }
 
   componentDidMount() {
+    // if (
+    //   this.props.operator.date &&
+    //   this.props.operator.sortedOrders &&
+    //   this.props.operator.sortedOrders.length > 0
+    // ) {
+    //   this.setState({
+    //     date: this.props.operator.date
+    //   });
+    // } else {
     this.props.getSortedOrders(this.state.date);
+    // }
   };
 
   onChange = (date) => {
-    this.setState({
-      date: date
-    });
-    this.props.getSortedOrders(date);
+    // do not send another request if orders are already being loaded
+    if (!this.props.operator.loadingSortedOrders) {
+      this.setState({
+        date: date
+      });
+      this.props.getSortedOrders(date);
+    }
   };
 
   onSwiped = (direction) => {
@@ -45,15 +58,20 @@ class Operator extends Component {
         date: newDate
       });
     }
+
     this.props.getSortedOrders(this.state.date);
   };
 
-  today = (e) => {
+  today = () => {
     let newDate = new Date();
-    this.setState({
-      date: newDate
-    });
-    this.props.getSortedOrders(newDate);
+
+    // do not send another request if orders are already being loaded
+    if (!this.props.operator.loadingSortedOrders) {
+      this.setState({
+        date: newDate
+      });
+      this.props.getSortedOrders(newDate);
+    }
   };
 
   render() {
@@ -75,11 +93,16 @@ class Operator extends Component {
                 value={this.state.date}
               />
 
-              <button className="btn btn-dark mt-3" onClick={() => this.today()}>Показать Сегодня</button>
+              <button
+                className="btn btn-dark mt-3"
+                onClick={() => this.today()}
+              >
+                <i className="fas fa-calendar-day"></i> Показать Сегодня
+              </button>
             </div>
           </div>
           <div className="col-lg-9">
-            <h1 className="text-center">Заявки на <Moment format="DD/MM/YYYY">{this.state.date}</Moment></h1>
+            <h2 className="text-center">Заявки на <Moment format="DD/MM/YYYY">{this.state.date}</Moment></h2>
             {loadingSortedOrders ? <Spinner /> : (
               <Swipeable
                 trackMouse

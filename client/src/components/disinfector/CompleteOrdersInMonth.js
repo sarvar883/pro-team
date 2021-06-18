@@ -41,8 +41,13 @@ class CompleteOrdersInMonth extends Component {
           <div className="card order">
             <div className="card-body p-0">
               <ul className="font-bold mb-0 list-unstyled">
+                {order.prevFailedOrder && (
+                  <li><h4><i className="fas fas fa-exclamation"></i> Повторный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                )}
 
-                {order.failed && <li className="text-danger">Это некачественный заказ</li>}
+                {order.failed && (
+                  <li><h4><i className="fas fas fa-exclamation"></i> Некачественный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                )}
 
                 {order.operatorDecided ? (
                   <React.Fragment>
@@ -56,6 +61,10 @@ class CompleteOrdersInMonth extends Component {
                     ) : <li className="text-danger">Оператор Отклонил (<Moment format="DD/MM/YYYY HH:mm">{order.operatorCheckedAt}</Moment>)</li>}
                   </React.Fragment>
                 ) : <li>Оператор еще не рассмотрел заявку</li>}
+
+
+
+
 
 
                 {order.accountantDecided ? (
@@ -85,6 +94,48 @@ class CompleteOrdersInMonth extends Component {
 
                   </React.Fragment>
                 )}
+
+
+
+                {/* {order.clientType === 'corporate' && order.paymentMethod === 'notCash' && !order.accountantDecided ? <li>Бухгалтер еще не рассмотрел заявку</li> : ''}
+
+                {order.clientType === 'corporate' && order.paymentMethod === 'notCash' && order.accountantDecided ?
+                  <React.Fragment>
+                    <li>Бухгалтер рассмотрел заявку</li>
+                    {order.accountantConfirmed ? (
+                      <React.Fragment>
+                        <li className="text-success">Бухгалтер Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{order.accountantCheckedAt}</Moment>)</li>
+                        <li>Счет-Фактура: {order.invoice}</li>
+                        <li>Общая Сумма: {order.cost.toLocaleString()} UZS (каждому по {(order.cost / order.disinfectors.length).toLocaleString()} UZS)</li>
+                      </React.Fragment>
+                    ) : <li className="text-danger">Бухгалтер Отклонил (<Moment format="DD/MM/YYYY HH:mm">{order.accountantCheckedAt}</Moment>)</li>}
+                  </React.Fragment>
+                  : ''}
+
+                {order.clientType === 'corporate' && order.paymentMethod === 'cash' && !order.adminDecided ? <li>Админ еще не рассмотрел заявку</li> : ''}
+
+                {order.clientType === 'corporate' && order.paymentMethod === 'cash' && order.adminDecided ? (
+                  <React.Fragment>
+                    <li>Админ рассмотрел заявку</li>
+                    {order.adminConfirmed ? (
+                      <li className="text-success">Админ Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{order.adminCheckedAt}</Moment>)</li>
+                    ) : <li className="text-danger">Админ Отклонил (<Moment format="DD/MM/YYYY HH:mm">{order.adminCheckedAt}</Moment>)</li>}
+                  </React.Fragment>
+                ) : ''}
+
+                {order.clientType === 'individual' && !order.adminDecided ? <li>Админ еще не рассмотрел заявку</li> : ''}
+                {order.clientType === 'individual' && order.adminDecided ? (
+                  <React.Fragment>
+                    <li>Админ рассмотрел заявку</li>
+                    {order.adminConfirmed ? (
+                      <li className="text-success">Админ Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{order.adminCheckedAt}</Moment>)</li>
+                    ) : <li className="text-danger">Админ Отклонил (<Moment format="DD/MM/YYYY HH:mm">{order.adminCheckedAt}</Moment>)</li>}
+                  </React.Fragment>
+                ) : ''} */}
+
+
+
+
 
 
                 {order.clientType === 'corporate' ?
@@ -135,6 +186,14 @@ class CompleteOrdersInMonth extends Component {
                   <li>Общая Сумма: {order.cost.toLocaleString()} UZS  (каждому по {(order.cost / order.disinfectors.length).toLocaleString()} UZS)</li>
                   : ''}
 
+                {/* {order.userAcceptedOrder ? (
+                  <li>Заказ принял: {order.userAcceptedOrder.occupation} {order.userAcceptedOrder.name}</li>
+                ) : ''} */}
+
+                {/* {order.userCreated ? (
+                  <li>Заказ добавил: {order.userCreated.occupation} {order.userCreated.name}</li>
+                ) : ''} */}
+
                 <li>Форма Выполнения Заказа заполнена: <Moment format="DD/MM/YYYY HH:mm">{order.completedAt}</Moment></li>
               </ul>
             </div>
@@ -152,6 +211,7 @@ class CompleteOrdersInMonth extends Component {
         ) : (
           completeOrders
         )}
+        {/* {completeOrders} */}
       </div>
     )
   }

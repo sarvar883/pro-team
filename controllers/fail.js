@@ -43,11 +43,20 @@ exports.createNewAfterFail = async (req, res) => {
       newOrderAfterFail.clientId = failedOrder.clientId._id;
     }
 
+    // console.log('server', newOrderAfterFail);
+
+
     // find failed order
     const previousfailedOrder = await Order.findById(failedOrder._id);
 
     previousfailedOrder.failed = true;
-    previousfailedOrder.nextOrderAfterFail = newOrderAfterFail._id;
+    // previousfailedOrder.nextOrderAfterFail = newOrderAfterFail._id;
+
+    // повторные заказы после некачественного заказа (массив)
+    let nextOrders = [...previousfailedOrder.nextOrdersAfterFailArray];
+    nextOrders.push(newOrderAfterFail._id);
+    previousfailedOrder.nextOrdersAfterFailArray = nextOrders;
+
 
     if (userOccupation === 'operator') {
       previousfailedOrder.operatorDecided = true;
@@ -97,6 +106,7 @@ exports.createNewAfterFail = async (req, res) => {
 };
 
 
+// вытащить из БД некачественные и повторные заказы !!
 exports.getFailedOrders = (req, res) => {
   let timeObject;
   if (req.body.object.type === 'month') {
@@ -109,16 +119,46 @@ exports.getFailedOrders = (req, res) => {
 
   Order.find({
     completed: true,
-    failed: true,
     $and: [
       { dateFrom: { '$gte': timeObject.min } },
       { dateFrom: { '$lt': timeObject.max } }
-    ]
+    ],
+    $or: [
+      // некачественные заказы
+      { failed: true },
+      // повторные заказы
+      { prevFailedOrder: { $exists: true } }
+    ],
   })
-    .populate('disinfectorId clientId disinfectors.user')
+    // .populate('disinfectorId clientId disinfectors.user')
     .populate({
-      // populate field 'nextOrderAfterFail' and field 'disinfectorId' inside it
-      path: 'nextOrderAfterFail',
+      path: 'disinfectorId',
+      select: 'name occupation'
+    })
+    .populate({
+      path: 'clientId',
+      select: 'name'
+    })
+    .populate({
+      path: 'disinfectors.user',
+      select: 'name occupation'
+    })
+
+    .populate({
+      path: 'prevFailedOrder',
+      model: 'Order',
+      select: 'dateFrom disinfectorId',
+      populate: {
+        path: 'disinfectorId',
+        model: 'User',
+        select: 'occupation name'
+      }
+    })
+
+    .populate({
+      // populate field 'nextOrdersAfterFailArray' and field 'disinfectorId' inside it
+      // path: 'nextOrderAfterFail',
+      path: 'nextOrdersAfterFailArray',
       model: 'Order',
       // select only 2 fields
       select: 'dateFrom disinfectorId',

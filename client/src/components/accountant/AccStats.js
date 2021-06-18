@@ -173,7 +173,7 @@ class AccStats extends Component {
                   {monthOptions}
                 </select>
               </div>
-              <button type="submit" className="btn btn-success mr-1 mt-1">Искать</button>
+              <button type="submit" className="btn btn-success mr-1 mt-1"><i className="fas fa-search"></i> Искать</button>
 
               <button type="button" className="btn btn-danger mr-1 mt-1" onClick={() => this.getSpecificMonthStats('current')}>Этот месяц</button>
 
@@ -188,7 +188,7 @@ class AccStats extends Component {
                 <label htmlFor="day"><strong>Выберите День:</strong></label>
                 <input type="date" name="day" className="form-control" onChange={this.onChange} required />
               </div>
-              <button type="submit" className="btn btn-primary">Искать</button>
+              <button type="submit" className="btn btn-primary"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 

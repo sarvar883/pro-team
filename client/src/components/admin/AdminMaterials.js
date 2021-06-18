@@ -7,7 +7,11 @@ import Moment from 'react-moment';
 import materials from '../common/materials';
 import removeZeros from '../../utils/removeZerosMat';
 
-import { getAllDisinfectorsAndSubadmins, getCurrentMaterials, addMaterialToDisinfector } from '../../actions/adminActions';
+import {
+  getAllDisinfectorsAndSubadmins,
+  getCurrentMaterials,
+  addMaterialToDisinfector
+} from '../../actions/adminActions';
 
 class AdminMaterials extends Component {
   state = {
@@ -250,13 +254,13 @@ class AdminMaterials extends Component {
                   <label htmlFor="consumption">Выберите Материал и Количество:</label>
                   {renderMaterials}
 
-                  {this.state.array.length < materials.length ? <button className="btn btn-primary mr-2 mt-2" onClick={this.addMaterial}>Добавить Материал</button> : ''}
+                  {this.state.array.length < materials.length ? <button className="btn btn-primary mr-2 mt-2" onClick={this.addMaterial}><i className="fas fa-plus"></i> Добавить Материал</button> : ''}
 
-                  {this.state.array.length === 1 ? '' : <button className="btn btn-danger mt-2" onClick={this.deleteMaterial}>Удалить последний материал</button>}
+                  {this.state.array.length === 1 ? '' : <button className="btn btn-danger mt-2" onClick={this.deleteMaterial}><i className="fas fa-trash-alt"></i> Удалить последний материал</button>}
 
                   <div className="border-bottom"></div>
 
-                  <button type="submit" className="btn btn-success">Добавить Пользователю</button>
+                  <button type="submit" className="btn btn-success"><i className="fas fa-plus-circle"></i> Добавить Пользователю</button>
                 </form>
               </div>
             </div>

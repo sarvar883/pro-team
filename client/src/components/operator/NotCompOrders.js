@@ -35,7 +35,7 @@ class NotCompOrders extends Component {
     let orders = this.props.operator.sortedOrders.sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
 
     let renderOrders = orders.map((order, index) =>
-      <div className="col-lg-4 col-md-6 col-sm-6 pl-0 mt-3" key={index}>
+      <div className="col-lg-4 col-md-6 col-sm-6 mt-2" key={index}>
         <div className="card order mt-2">
           <div className="card-body p-0">
             <ul className="font-bold list-unstyled mb-0">
@@ -68,7 +68,7 @@ class NotCompOrders extends Component {
                   if (window.confirm('Вы уверены?')) {
                     this.deleteOrderFunc(order);
                   }
-                }}>Удалить</button>
+                }}><i className="fas fa-trash-alt"></i> Удалить</button>
               </div>
             </ul>
           </div>
@@ -83,9 +83,14 @@ class NotCompOrders extends Component {
             <h2 className="text-center">Невыполненные заказы</h2>
           </div>
         </div>
+
         {this.props.operator.loadingSortedOrders ? <Spinner /> : (
-          <div className="row m-0">
-            {renderOrders}
+          <div className="row">
+            <div className="col-12">
+              <div className="row">
+                {renderOrders}
+              </div>
+            </div>
           </div>
         )}
       </div>

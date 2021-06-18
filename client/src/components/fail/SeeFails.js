@@ -7,6 +7,8 @@ import Moment from 'react-moment';
 import { getFailedOrders } from '../../actions/failActions';
 import monthsNames from '../common/monthNames';
 import getMonthAndYearLabels from '../../utils/monthAndYearLabels';
+import returnMonthAndYear from '../../utils/returnMonthAndYear';
+
 import ShowFails from './ShowFails';
 
 import { getWeekDays, getWeekRange } from '../common/weekFunc';
@@ -62,6 +64,49 @@ class SeeFails extends Component {
 
   onChange = (e) => this.setState({ [e.target.name]: e.target.value });
 
+  failedOrdersMonth = (e) => {
+    e.preventDefault();
+
+    const month = Number(this.state.month);
+    const year = Number(this.state.year);
+
+    const object = {
+      userOccupation: this.props.auth.user.occupation,
+      userId: this.props.auth.user.id,
+      type: 'month',
+      month,
+      year
+    };
+
+    // вытащить из БД некачественные и повторные заказы !!
+    this.props.getFailedOrders(object);
+
+    this.setState({
+      headingMonth: month,
+      headingYear: year
+    });
+  };
+
+  getSpecificMonthStats = (param) => {
+    const { month, year } = returnMonthAndYear(param);
+
+    const object = {
+      userOccupation: this.props.auth.user.occupation,
+      userId: this.props.auth.user.id,
+      type: 'month',
+      month,
+      year
+    };
+
+    // вытащить из БД некачественные и повторные заказы !!
+    this.props.getFailedOrders(object);
+
+    this.setState({
+      headingMonth: month,
+      headingYear: year
+    });
+  };
+
   failedOrdersDay = (e) => {
     e.preventDefault();
 
@@ -71,7 +116,8 @@ class SeeFails extends Component {
       type: 'day',
       day: this.state.day
     };
-    console.log('day', object);
+
+    // вытащить из БД некачественные и повторные заказы !!
     this.props.getFailedOrders(object);
 
     this.setState({
@@ -123,8 +169,17 @@ class SeeFails extends Component {
   // end of weekly calendar
 
 
-
   render() {
+    const { monthLabels, yearLabels } = getMonthAndYearLabels();
+
+    const yearsOptions = yearLabels.map((year, index) =>
+      <option value={year.value} key={index}>{year.label}</option>
+    );
+    const monthOptions = monthLabels.map((month, index) =>
+      <option value={month.value} key={index}>{month.label}</option>
+    );
+
+
     // weekly calender
     const { hoverRange, selectedDays } = this.state;
 
@@ -144,26 +199,53 @@ class SeeFails extends Component {
     // end of calendar
 
 
-
     return (
       <div className="container-fluid">
         <div className="row">
+          <div className="col-12">
+            <h2 className="text-center">Некачественные и Повторные заказы</h2>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-lg-4 col-md-6 mt-3">
+            <form onSubmit={this.failedOrdersMonth} className="form-bg p-2">
+              <h4 className="text-center">Некачественные и Повторные заказы по месяцам</h4>
+              <div className="form-group">
+                <label htmlFor="year"><strong>Выберите Год:</strong></label>
+                <select name="year" className="form-control" onChange={this.onChange} required>
+                  {yearsOptions}
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="month"><strong>Выберите Месяц:</strong></label>
+                <select name="month" className="form-control" onChange={this.onChange} required>
+                  {monthOptions}
+                </select>
+              </div>
+              <button type="submit" className="btn btn-success mr-1 mt-1"><i className="fas fa-search"></i> Искать</button>
+
+              <button type="button" className="btn btn-danger mr-1 mt-1" onClick={() => this.getSpecificMonthStats('current')}>Этот месяц</button>
+
+              <button type="button" className="btn btn-primary mr-1 mt-1" onClick={() => this.getSpecificMonthStats('previous')}>Прошлый месяц</button>
+            </form>
+          </div>
 
           <div className="col-lg-4 col-md-6 mt-3">
             <form onSubmit={this.failedOrdersDay} className="form-bg p-2">
-              <h4 className="text-center">Некачественные заказы по дням</h4>
+              <h4 className="text-center">Некачественные и Повторные заказы по дням</h4>
               <div className="form-group">
                 <label htmlFor="day"><strong>Выберите День:</strong></label>
                 <input type="date" name="day" className="form-control" onChange={this.onChange} required />
               </div>
-              <button type="submit" className="btn btn-primary">Искать</button>
+              <button type="submit" className="btn btn-primary"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 
 
           <div className="col-lg-4 col-md-6 weekly-stats mt-3">
             <div className="SelectedWeekExample form-bg font-weight-bold">
-              <h4 className="text-center">Некачественные заказы по неделям</h4>
+              <h4 className="text-center">Некачественные и Повторные заказы по неделям</h4>
               <DayPicker
                 selectedDays={selectedDays}
                 showWeekNumbers
@@ -182,13 +264,13 @@ class SeeFails extends Component {
         <div className="row mt-2">
           <div className="col-12">
             {this.props.fail.searchVars.method === 'week' ?
-              <h2 className="text-center pl-3 pr-3">Некачественные заказы за <Moment format="DD/MM/YYYY">{this.state.selectedDays[0]}</Moment> - <Moment format="DD/MM/YYYY">{this.state.selectedDays[6]}</Moment></h2> : ''}
+              <h2 className="text-center pl-3 pr-3">Некачественные и Повторные заказы за <Moment format="DD/MM/YYYY">{this.state.selectedDays[0]}</Moment> - <Moment format="DD/MM/YYYY">{this.state.selectedDays[6]}</Moment></h2> : ''}
 
             {this.props.fail.searchVars.method === 'month' ?
-              <h2 className="text-center pl-3 pr-3">Некачественные заказы за {monthsNames[this.state.headingMonth]}, {this.state.headingYear}</h2> : ''}
+              <h2 className="text-center pl-3 pr-3">Некачественныe и Повторные заказы за {monthsNames[this.state.headingMonth]}, {this.state.headingYear}</h2> : ''}
 
             {this.props.fail.searchVars.method === 'day' ?
-              <h2 className="text-center pl-3 pr-3">Некачественные заказы за {this.state.headingDay}</h2> : ''}
+              <h2 className="text-center pl-3 pr-3">Некачественные и Повторные заказы за {this.state.headingDay}</h2> : ''}
           </div>
         </div>
 

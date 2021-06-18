@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+
 import Spinner from '../common/Spinner';
 import Moment from 'react-moment';
 import TextFieldGroup from '../common/TextFieldGroup';
 
-import { getCompleteOrderById, accountantConfirmQuery } from '../../actions/accountantActions';
+import ClientNotSatisfiedButton from '../common/ClientNotSatisfiedButton';
+import {
+  getCompleteOrderById,
+  accountantConfirmQuery
+} from '../../actions/accountantActions';
+
 
 class ConfirmQueryForm extends Component {
   state = {
@@ -18,7 +24,11 @@ class ConfirmQueryForm extends Component {
       userAcceptedOrder: {},
       disinfectors: [],
       prevFailedOrder: {},
-      nextOrderAfterFail: {}
+      nextOrdersAfterFailArray: [],
+
+
+      // we no longer use this field
+      nextOrderAfterFail: {},
     },
     invoice: '',
     cost: ''
@@ -64,6 +74,7 @@ class ConfirmQueryForm extends Component {
       orderId: this.state.query._id,
       decision: 'confirm'
     };
+    // console.log('indiv client', object);
     this.props.accountantConfirmQuery(object, this.props.history);
   };
 
@@ -89,12 +100,13 @@ class ConfirmQueryForm extends Component {
     this.props.accountantConfirmQuery(object, this.props.history);
   }
 
-  goToAddNewForm = (order) => {
-    this.props.history.push(`/fail/add-new/${order._id}`, {
-      pathname: `/fail/add-new/${order._id}`,
-      state: { order }
-    });
-  };
+  // goToAddNewForm = (order) => {
+  //   this.props.history.push(`/fail/add-new/${order._id}`, {
+  //     pathname: `/fail/add-new/${order._id}`,
+  //     state: { order }
+  //   });
+  //   // this.props.goToAddNewForm(order, this.props.history);
+  // };
 
   render() {
     const { query } = this.state;
@@ -118,6 +130,8 @@ class ConfirmQueryForm extends Component {
       </li>
     );
 
+    console.log('order', query);
+
     return (
       <div className="container-fluid">
         <div className="row m-0">
@@ -128,11 +142,36 @@ class ConfirmQueryForm extends Component {
                   <div className="card order mt-2">
                     <div className="card-body p-0">
                       <ul className="font-bold mb-0 list-unstyled">
+                        {query.prevFailedOrder && (
+                          <li><h4><i className="fas fas fa-exclamation"></i> Повторный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                        )}
+
+                        {query.failed && (
+                          <li><h4><i className="fas fas fa-exclamation"></i> Некачественный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                        )}
+
                         {query.disinfectorId && (
                           <li>Ответственный: {query.disinfectorId.occupation} {query.disinfectorId.name}</li>
                         )}
 
-                        {query.failed && <li className="text-danger">Это некачественный заказ</li>}
+
+                        {query.failed && query.nextOrdersAfterFailArray && (
+                          <React.Fragment>
+                            <li className="text-primary">Повторов у этого заказа: {query.nextOrdersAfterFailArray.length}</li>
+
+                            {query.nextOrdersAfterFailArray.length > 0 && (
+                              <React.Fragment>
+                                <li className="text-primary">Время последнего заказа: <Moment format="DD/MM/YYYY HH:mm">{query.nextOrdersAfterFailArray[query.nextOrdersAfterFailArray.length - 1].dateFrom}</Moment></li>
+
+                                <li className="text-primary">Выполняет последний заказ: {query.nextOrdersAfterFailArray[query.nextOrdersAfterFailArray.length - 1].disinfectorId.occupation} {query.nextOrdersAfterFailArray[query.nextOrdersAfterFailArray.length - 1].disinfectorId.name}</li>
+                              </React.Fragment>
+                            )}
+                          </React.Fragment>
+                        )}
+
+
+
+
 
                         {query.operatorDecided ? (
                           <React.Fragment>
@@ -186,7 +225,7 @@ class ConfirmQueryForm extends Component {
                             ) : (
                               <React.Fragment>
                                 <li>Тип Платежа: Безналичный</li>
-                                <li>Номер Договора: {query.contractNumber}</li>
+                                <li>Номер Договора: {query.contractNumber || '--'}</li>
                               </React.Fragment>
                             )}
                           </React.Fragment>
@@ -209,24 +248,22 @@ class ConfirmQueryForm extends Component {
 
                       {query.clientType === 'individual' || query.paymentMethod === 'cash' ? (
                         <div className="btn-group mt-3">
-                          <button className="btn btn-success mr-2" onClick={() => { if (window.confirm('Вы уверены подтвердить заказ?')) { this.confirmQueryFromIndividualClient() } }}>Подтвердить</button>
+                          <button className="btn btn-success mr-2" onClick={() => { if (window.confirm('Вы уверены подтвердить заказ?')) { this.confirmQueryFromIndividualClient() } }}><i className="fas fa-check-square"></i> Подтвердить</button>
                         </div>
                       ) : ''}
 
                       <div className="btn-group mt-3">
-                        <button className="btn btn-danger mr-2" onClick={() => { if (window.confirm('Вы уверены отменить заказ?')) { this.reject() } }}>Отменить Выполнение Заказа</button>
+                        <button className="btn btn-danger mr-2" onClick={() => { if (window.confirm('Вы уверены отменить заказ?')) { this.reject() } }}><i className="fas fa-ban"></i> Отменить Выполнение Заказа</button>
                       </div>
 
                       <div className="btn-group mt-3">
-                        <button className="btn btn-dark mr-2" onClick={() => { if (window.confirm('Вы уверены отправить заказ обратно дезинфектору?')) { this.returnBack() } }}>Отправить Обратно</button>
+                        <button className="btn btn-dark mr-2" onClick={() => { if (window.confirm('Вы уверены отправить заказ обратно дезинфектору?')) { this.returnBack() } }}><i className="fas fa-undo"></i> Отправить Обратно</button>
                       </div>
 
-                      <div className="btn-group mt-3">
-                        <button
-                          className="btn btn-secondary mr-2"
-                          onClick={() => this.goToAddNewForm(query)}
-                        >Клиент Недоволен</button>
-                      </div>
+                      <ClientNotSatisfiedButton
+                        order={query}
+                        shouldLoadOrder={true}
+                      />
 
                     </div>
                   </div>
@@ -248,6 +285,7 @@ class ConfirmQueryForm extends Component {
                           onChange={this.onChange}
                           required
                         />
+
                         <TextFieldGroup
                           label="Введите сумму заказа (в сумах):"
                           type="number"
@@ -257,7 +295,10 @@ class ConfirmQueryForm extends Component {
                           onChange={this.onChange}
                           required
                         />
-                        <button className="btn btn-success btn-block">Подтвердить Выполнение Заказа</button>
+
+                        <button className="btn btn-success btn-block">
+                          <i className="fas fa-check-square"></i> Подтвердить Выполнение Заказа
+                        </button>
                       </form>
                     </div>
                   </div>

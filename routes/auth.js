@@ -9,21 +9,66 @@ const passport = require('passport');
 
 const isAdmin = require('../middleware/isAdmin');
 
-router.post('/login', authController.loginUser);
+router.post(
+  '/login',
+  authController.loginUser
+);
 
-router.post('/register', passport.authenticate('jwt', { session: false }), isAdmin, authController.registerUser);
+router.post(
+  '/register',
+  passport.authenticate('jwt', { session: false }),
+  isAdmin,
+  authController.registerUser
+);
 
-router.post('/auth/get-disinfector-materials', passport.authenticate('jwt', { session: false }), authController.getDisinfectorMaterials);
+router.post(
+  '/auth/get-disinfector-materials',
+  passport.authenticate('jwt', { session: false }),
+  authController.getDisinfectorMaterials
+);
 
-// @desc    Return current user
-router.get('/current', passport.authenticate('jwt', { session: false }), authController.currentUser);
+// Return current user
+router.get(
+  '/current',
+  passport.authenticate('jwt', { session: false }),
+  authController.currentUser
+);
 
-router.post('/change-password', passport.authenticate('jwt', { session: false }), isAdmin, authController.changePassword);
+router.post(
+  '/change-password',
+  passport.authenticate('jwt', { session: false }),
+  isAdmin,
+  authController.changePassword
+);
 
-router.post('/get-user-by-id', passport.authenticate('jwt', { session: false }), isAdmin, authController.getUserById);
+router.post(
+  '/get-user-by-id',
+  passport.authenticate('jwt', { session: false }),
+  isAdmin,
+  authController.getUserById
+);
 
-router.post('/edit-user', passport.authenticate('jwt', { session: false }), isAdmin, authController.editUser);
 
-router.post('/disable-user', passport.authenticate('jwt', { session: false }), isAdmin, authController.disableUser);
+// new universal endpoint
+router.post(
+  '/get-users',
+  passport.authenticate('jwt', { session: false }),
+  authController.getUsers
+);
+
+
+router.post(
+  '/edit-user',
+  passport.authenticate('jwt', { session: false }),
+  isAdmin,
+  authController.editUser
+);
+
+router.post(
+  '/disable-user',
+  passport.authenticate('jwt', { session: false }),
+  isAdmin,
+  authController.disableUser
+);
 
 module.exports = router;

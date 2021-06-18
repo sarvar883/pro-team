@@ -36,6 +36,7 @@ class ShowQueriesForAdmin extends Component {
       pathname: `/fail/add-new/${order._id}`,
       state: { order }
     });
+    // this.props.goToAddNewForm(order, this.props.history);
   };
 
   componentWillUnmount() {
@@ -69,6 +70,14 @@ class ShowQueriesForAdmin extends Component {
           <div className="card order mt-2">
             <div className="card-body p-0">
               <ul className="font-bold mb-0 pl-0 list-unstyled">
+                {order.prevFailedOrder && (
+                  <li><h4><i className="fas fas fa-exclamation"></i> Повторный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                )}
+
+                {order.failed && (
+                  <li><h4><i className="fas fas fa-exclamation"></i>Некачественный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                )}
+
                 {order.returnedBack ? (
                   <li className="text-danger">Это возвращенный заказ</li>
                 ) : ''}
@@ -76,8 +85,6 @@ class ShowQueriesForAdmin extends Component {
                 {order.disinfectorId ? (
                   <li>Ответственный: {order.disinfectorId.occupation} {order.disinfectorId.name}</li>
                 ) : ''}
-
-                {order.failed && <li className="text-danger">Это некачественный заказ</li>}
 
                 {order.clientType === 'corporate' ?
                   <React.Fragment>

@@ -42,6 +42,7 @@ class MatComHistory extends Component {
       month: Number(thisMonth),
       year: Number(thisYear)
     };
+    // this.props.getMatComMonth(thisMonth, thisYear);
     this.props.getMaterialComingEvents(object);
 
     this.props.getAllDisinfectorsAndSubadmins();
@@ -60,6 +61,7 @@ class MatComHistory extends Component {
       month: Number(this.state.month),
       year: Number(this.state.year)
     };
+    // this.props.getMatComMonth(this.state.month, this.state.year);
     this.props.getMaterialComingEvents(object);
 
     this.setState({
@@ -88,6 +90,7 @@ class MatComHistory extends Component {
       type: 'week',
       days: getWeekDays(getWeekRange(date).from)
     }
+    // this.props.getMatComWeek(getWeekDays(getWeekRange(date).from));
     this.props.getMaterialComingEvents(object);
 
     this.setState({
@@ -113,13 +116,13 @@ class MatComHistory extends Component {
       days: getWeekDays(getWeekRange(days[0]).from)
     };
     this.props.getMaterialComingEvents(object);
+    // this.props.getMatComWeek(getWeekDays(getWeekRange(days[0]).from));
 
     this.setState({
       selectedDays: getWeekDays(getWeekRange(days[0]).from)
     });
   };
   // end of weekly calendar
-
 
 
   render() {
@@ -131,7 +134,6 @@ class MatComHistory extends Component {
     const monthOptions = monthLabels.map((month, index) =>
       <option value={month.value} key={index}>{month.label}</option>
     );
-
 
 
     // weekly calender
@@ -153,7 +155,6 @@ class MatComHistory extends Component {
     // end of calendar
 
 
-
     return (
       <div className="container-fluid" >
         <div className="row">
@@ -172,7 +173,7 @@ class MatComHistory extends Component {
                   {monthOptions}
                 </select>
               </div>
-              <button type="submit" className="btn btn-success mr-1 mt-1">Искать</button>
+              <button type="submit" className="btn btn-success mr-1 mt-1"><i className="fas fa-search"></i> Искать</button>
 
               <button type="button" className="btn btn-danger mr-1 mt-1" onClick={() => this.getSpecificMonthStats('current')}>Этот месяц</button>
 

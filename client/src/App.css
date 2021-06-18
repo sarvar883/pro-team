@@ -1,10 +1,17 @@
 body {
   /* because of the Back button at the bottom of the screen */
   margin-bottom: 60px;
+
+  /* change theme transition */
+  transition: 0.15s;
 }
 
+/* shadow */
 .card {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.dark .card {
+  box-shadow: 0 4px 8px 0 rgba(149, 183, 183), 0 3px 10px 0 rgba(149, 183, 183);
 }
 
 

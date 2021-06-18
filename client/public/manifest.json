@@ -1,15 +1,25 @@
 {
-  "short_name": "Pro Team",
-  "name": "App for Pro Team",
+  "short_name": "ProDez",
+  "name": "ProDez®: Профессиональная Дезинфекция",
   "icons": [
+    {
+      "src": "/img/p.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
     {
       "src": "/img/p-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/img/p.png",
-      "sizes": "144x144",
+      "src": "/img/p-300.png",
+      "sizes": "300x300",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/p-400.png",
+      "sizes": "400x400",
       "type": "image/png"
     }
   ],

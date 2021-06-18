@@ -51,8 +51,19 @@ export const createOrderAfterFail = (object, history, occupation) => async (disp
 
   // console.log('order', object);
   axios.post('/fail/create-new-after-fail', { object })
-    .then(res => {
-      return history.push(`/${occupation}/order-queries`)
+    .then(() => {
+      let addressToRedirect = '';
+
+      if (occupation === 'admin' || occupation === 'accountant') {
+        // because we do not have /admin/order-queries route for admin
+        addressToRedirect = `/${occupation}`;
+      } else {
+        addressToRedirect = `/${occupation}/order-queries`;
+      }
+
+      // clearSortedOrders(dispatch);
+
+      return history.push(addressToRedirect);
     })
     .catch(err =>
       dispatch({
@@ -63,6 +74,7 @@ export const createOrderAfterFail = (object, history, occupation) => async (disp
 };
 
 
+// вытащить из БД некачественные и повторные заказы !!
 export const getFailedOrders = (object) => async (dispatch) => {
   dispatch({
     type: SET_LOADING_FAILED_ORDER
@@ -75,10 +87,12 @@ export const getFailedOrders = (object) => async (dispatch) => {
 
   try {
     const res = await axios.post('/fail/get-failed-orders', { object });
+
     dispatch({
       type: GET_FAILED_ORDERS,
       payload: res.data
     });
+
   } catch (err) {
     dispatch({
       type: GET_ERRORS,

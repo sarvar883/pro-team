@@ -22,11 +22,14 @@ exports.getQueries = (req, res) => {
     adminDecidedReturn: false,
     adminDecided: false,
     accountantDecided: false,
+    // clientType: 'corporate',
+    // paymentMethod: 'notCash',
     $and: [
       { dateFrom: { '$gte': timeObject.min } },
       { dateFrom: { '$lt': timeObject.max } }
     ]
   })
+    // .populate('disinfectorId clientId')
     .populate({
       path: 'disinfectorId',
       select: 'name occupation'
@@ -48,6 +51,18 @@ exports.getQueryById = (req, res) => {
   Order
     .findById(req.body.id)
     .populate('disinfectorId userCreated clientId userAcceptedOrder disinfectors.user')
+    .populate({
+      // populate field 'nextOrdersAfterFailArray' and field 'disinfectorId' inside it
+      path: 'nextOrdersAfterFailArray',
+      model: 'Order',
+      // select only 2 fields
+      select: 'dateFrom disinfectorId',
+      populate: {
+        path: 'disinfectorId',
+        model: 'User',
+        select: 'occupation name'
+      }
+    })
     .exec()
     .then(order => res.json(order))
     .catch(err => {
@@ -142,3 +157,16 @@ exports.getAccStats = (req, res) => {
       res.status(400).json(err);
     });
 };
+
+
+// exports.searchContracts = (req, res) => {
+//   // case insensitive search
+//   Order.find({ contractNumber: new RegExp(`^${req.body.object.payload}$`, 'i') })
+//     .populate('disinfectorId userCreated clientId userAcceptedOrder disinfectors.user')
+//     .exec()
+//     .then(orders => res.json(orders))
+//     .catch(err => {
+//       console.log('Accountant searchContracts ERROR', err);
+//       res.status(400).json(err);
+//     });
+// };

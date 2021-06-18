@@ -168,7 +168,14 @@ export const getOperatorStats = (object) => (dispatch) => {
 
 export const getAllDisinfectorsAndSubadmins = () => (dispatch) => {
   dispatch(loadingDisinfectors());
-  axios.post('/admin/get-all-disinfectors-and-subadmins')
+
+  const object = {
+    method: 'role',
+    roles: ['disinfector', 'subadmin']
+  };
+
+  // axios.post('/admin/get-all-disinfectors-and-subadmins')
+  axios.post('/get-users', { object })
     .then(res =>
       dispatch({
         type: GET_ALL_DISINFECTORS_FOR_ADMIN,
@@ -186,7 +193,14 @@ export const getAllDisinfectorsAndSubadmins = () => (dispatch) => {
 
 export const getAllOperators = () => (dispatch) => {
   dispatch(loadingOperators());
-  axios.post('/admin/get-all-operators')
+
+  const object = {
+    method: 'role',
+    roles: ['operator']
+  };
+
+  // axios.post('/admin/get-all-operators')
+  axios.post('/get-users', { object })
     .then(res =>
       dispatch({
         type: GET_ALL_OPERATORS_FOR_ADMIN,
@@ -204,7 +218,14 @@ export const getAllOperators = () => (dispatch) => {
 
 export const getAllOperatorsAndAmins = () => (dispatch) => {
   dispatch(loadingOperators());
-  axios.post('/admin/get-all-operators-and-admins')
+
+  const object = {
+    method: 'role',
+    roles: ['operator', 'admin']
+  };
+
+  // axios.post('/admin/get-all-operators-and-admins')
+  axios.post('/get-users', { object })
     .then(res =>
       dispatch({
         type: GET_ALL_OPERATORS_AND_ADMINS_FOR_ADMIN,
@@ -492,6 +513,11 @@ export const getUserById = (userId) => (dispatch) => {
 };
 
 
+export const setUserById = (user) => (dispatch) => {
+  dispatch({ type: GET_USER_BY_ID, payload: user });
+};
+
+
 export const editUser = (object, history) => (dispatch) => {
   axios.post('/edit-user', { object: object })
     .then(() => history.push('/admin/users'))
@@ -525,6 +551,42 @@ export const disableUser = (object, history) => (dispatch) => {
 export const addNewMaterial = (object, history) => (dispatch) => {
   axios.post('/admin/new-material', { object })
     .then(() => history.push('/admin'))
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err
+      })
+    );
+};
+
+
+export const deleteMaterialFromDB = (object, history) => (dispatch) => {
+  axios.post('/admin/delete-material', { object })
+    .then(() => history.push('/admin'))
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err
+      })
+    );
+};
+
+
+export const setDisinfectorMaterials = (object, history) => (dispatch) => {
+  axios.post('/admin/set-disinfector-materials', { object })
+    .then(() => history.push('/admin'))
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err
+      })
+    );
+};
+
+
+export const setCurrentMaterials = (object, history) => (dispatch) => {
+  axios.post('/admin/set-current-materials', { object })
+    .then(() => history.push('/admin/material-coming'))
     .catch(err =>
       dispatch({
         type: GET_ERRORS,

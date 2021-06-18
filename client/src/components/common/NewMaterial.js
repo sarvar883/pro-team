@@ -4,8 +4,10 @@ import { connect } from 'react-redux';
 
 import TextFieldGroup from '../common/TextFieldGroup';
 import SelectListGroup from '../common/SelectListGroup';
+import DeleteMaterial from './DeleteMaterial';
 
 import { addNewMaterial } from '../../actions/adminActions';
+
 
 class NewMaterial extends Component {
   state = {
@@ -37,12 +39,14 @@ class NewMaterial extends Component {
     ];
 
     return (
-      <div className="container mt-4">
+      <div className="container-fluid mt-4">
         <div className="row">
-          <div className="col-md-8 m-auto">
+
+          {/* Create New Material Form */}
+          <div className="col-md-6">
             <div className="card">
               <div className="card-body">
-                <h2 className="text-center">Добавить Новый Материал</h2>
+                <h3 className="text-center">Добавить Новый Материал</h3>
                 <form onSubmit={this.onSubmit}>
                   <TextFieldGroup
                     label="Введите Имя Материала"
@@ -66,6 +70,10 @@ class NewMaterial extends Component {
               </div>
             </div>
           </div>
+
+
+          {/* Create Delete Material Form */}
+          <DeleteMaterial />
         </div>
       </div>
     )

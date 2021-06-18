@@ -53,7 +53,14 @@ export const getDisinfectorStats = (object) => (dispatch) => {
 
 export const getAllDisinfectorsAndSubadmins = () => (dispatch) => {
   dispatch(loadingDisinfectors());
-  axios.get('/order/get-all-disinfectors')
+
+  const object = {
+    method: 'role',
+    roles: ['disinfector', 'subadmin']
+  };
+
+  // axios.get('/order/get-all-disinfectors')
+  axios.post('/get-users', { object })
     .then(res =>
       dispatch({
         type: GET_ALL_DISINFECTORS,

@@ -203,9 +203,18 @@ class Queries extends Component {
           <div className="card order mt-2">
             <div className="card-body p-0">
               <ul className="font-bold mb-0 list-unstyled">
-                {item.returnedBack ? (
+                {item.prevFailedOrder && (
+                  <li><h4><i className="fas fas fa-exclamation"></i> Повторный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                )}
+
+                {item.failed && (
+                  <li><h4><i className="fas fas fa-exclamation"></i> Некачественный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                )}
+
+
+                {item.returnedBack && (
                   <li className="text-danger">Это возвращенный заказ</li>
-                ) : ''}
+                )}
 
                 {item.disinfectorId && (
                   <li>Ответственный: {item.disinfectorId.occupation} {item.disinfectorId.name}</li>
@@ -223,6 +232,14 @@ class Queries extends Component {
                     ) : <li className="text-danger">Оператор Отклонил (<Moment format="DD/MM/YYYY HH:mm">{item.operatorCheckedAt}</Moment>)</li>}
                   </React.Fragment>
                 ) : <li>Оператор еще не рассмотрел заявку</li>}
+
+
+                {/* {item.clientType === 'corporate' && <li>Номер Договора: {item.contractNumber}</li>} */}
+
+
+                {/* {item.clientId ? (
+                  <li className="text-danger">Корпоративный Клиент: {item.clientId.name}</li>
+                ) : <li className="text-danger">Корпоративный Клиент</li>} */}
 
                 {item.clientType === 'corporate' ?
                   <React.Fragment>
@@ -250,7 +267,7 @@ class Queries extends Component {
                 <li>Форма Выполнения Заказа заполнена: <Moment format="DD/MM/YYYY HH:mm">{item.completedAt}</Moment></li>
               </ul>
 
-              <Link to={`/accountant/order-confirm/${item._id}`} className="btn btn-dark">Форма Подтверждения</Link>
+              <Link to={`/accountant/order-confirm/${item._id}`} className="btn btn-dark"><i className="fab fa-wpforms"></i> Форма Подтверждения</Link>
             </div>
           </div>
         </div>
@@ -276,7 +293,7 @@ class Queries extends Component {
                   {monthOptions}
                 </select>
               </div>
-              <button type="submit" className="btn btn-success mr-1 mt-1">Искать</button>
+              <button type="submit" className="btn btn-success mr-1 mt-1"><i className="fas fa-search"></i> Искать</button>
 
               <button type="button" className="btn btn-danger mr-1 mt-1" onClick={() => this.getSpecificMonthStats('current')}>Этот месяц</button>
 
@@ -292,7 +309,7 @@ class Queries extends Component {
                 <label htmlFor="day"><strong>Выберите День:</strong></label>
                 <input type="date" name="day" className="form-control" onChange={this.onChange} required />
               </div>
-              <button type="submit" className="btn btn-primary">Искать</button>
+              <button type="submit" className="btn btn-primary"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 

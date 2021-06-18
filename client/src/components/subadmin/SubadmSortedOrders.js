@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+
 import { deleteOrder } from '../../actions/orderActions';
+import { getSortedOrders } from '../../actions/subadminActions';
+
+import orderFullyProcessed from '../../utils/orderFullyProcessed';
 
 // socket.io
 import openSocket from 'socket.io-client';
 import socketLink from '../common/socketLink';
-
-import { getSortedOrders } from '../../actions/subadminActions';
 
 class SubadmSortedOrders extends Component {
   _isMounted = false;
@@ -34,6 +36,14 @@ class SubadmSortedOrders extends Component {
     });
 
     socket.on('editOrder', data => {
+      // check if today
+      // if (
+      //   new Date(data.order.dateFrom).getDate() === new Date(this.props.date).getDate() &&
+      //   new Date(data.order.dateFrom).getMonth() === new Date(this.props.date).getMonth() &&
+      //   new Date(data.order.dateFrom).getFullYear() === new Date(this.props.date).getFullYear()
+      // ) {
+      //   this.editOrderOnDOM(data.order);
+      // }
       this.editOrderOnDOM(data.order);
     });
 
@@ -133,7 +143,7 @@ class SubadmSortedOrders extends Component {
       orderDateFrom: orderDateFrom,
     };
     this.props.deleteOrder(object, this.props.history, this.props.auth.user.occupation);
-    this.props.getSortedOrders(this.state.date);
+    // this.props.getSortedOrders(this.state.date);
     window.location.reload();
   }
 
@@ -158,7 +168,7 @@ class SubadmSortedOrders extends Component {
       // if (object.elements.length > 2) colnumber = 4;
       renderOrders = object.elements.map((element, i) =>
         <div className={`col-md-${colnumber} pr-0`} key={i}>
-          <div className={`card mt-2 order order-bg-${element.disinfectorId.color}`}>
+          <div className={`card mt-2 mr-2 order order-bg-${element.disinfectorId.color}`}>
             <div className="card-body p-0">
               <ul className="font-bold mb-0 list-unstyled">
                 {element.prevFailedOrder && <h3><i className="fas fas fa-exclamation"></i> Повторный заказ <i className="fas fas fa-exclamation"></i></h3>}
@@ -179,30 +189,61 @@ class SubadmSortedOrders extends Component {
                 <li>Тип Заказа: {element.typeOfService}</li>
               </ul>
 
-              <div className="btn-group">
-                <Link to={`/order-details/${element._id}`} className="btn btn-primary mr-1">Подробнее</Link>
-                <Link to={`/edit-order/${element._id}`} className="btn btn-warning mr-1">Редактировать</Link>
+              {/* если заказ полностью закрыт */}
+              {orderFullyProcessed(element) ? (
+                <React.Fragment>
+                  <Link
+                    to={`/order-full-details/${element._id}`}
+                    className="btn btn-primary mr-1 mt-2"
+                  >
+                    <i className="fas fa-info"></i> Подробнее
+                  </Link>
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  <Link
+                    to={`/order-details/${element._id}`}
+                    className="btn btn-primary mr-1 mt-2"
+                  >
+                    <i className="fas fa-info"></i> Подробнее
+                  </Link>
 
-                {this.props.date > new Date().setHours(0, 0, 0, 0) ? (
-                  <button className="btn btn-danger" onClick={() => {
-                    if (window.confirm('Вы уверены?')) {
-                      if (element.clientType === 'corporate') {
-                        this.deleteOrder(element._id, element.clientType, element.phone, element.clientId._id, element.dateFrom);
-                      } else if (element.clientType === 'individual') {
-                        this.deleteOrder(element._id, element.clientType, element.phone, '', element.dateFrom);
+                  <Link
+                    to={`/edit-order/${element._id}`}
+                    className="btn btn-warning mr-1 mt-2"
+                  >
+                    <i className="fas fa-edit"></i> Редактировать
+                  </Link>
+
+                  {this.props.date > new Date().setHours(0, 0, 0, 0) ? (
+                    <button className="btn btn-danger mt-2" onClick={() => {
+                      if (window.confirm('Вы уверены?')) {
+                        if (element.clientType === 'corporate') {
+                          this.deleteOrder(element._id, element.clientType, element.phone, element.clientId._id, element.dateFrom);
+                        } else if (element.clientType === 'individual') {
+                          this.deleteOrder(element._id, element.clientType, element.phone, '', element.dateFrom);
+                        }
                       }
-                    }
-                  }}>Удалить</button>
-                ) : ''}
-              </div>
+                    }}><i className="fas fa-trash-alt"></i> Удалить</button>
+                  ) : ''}
+                </React.Fragment>
+              )}
             </div>
           </div>
         </div>
       );
+
       return (
         <div className="hours" key={index}>
           <div className="help row mt-3" id={`hour-${object.hour}`}>
-            <button to="/create-order" className="btn btn-success mr-3" onClick={this.onClick.bind(this, object.hour, this.props.subadmin.date)}>+</button>
+            <button
+              to="/create-order"
+              className="btn btn-success mr-3"
+              onClick={this.onClick.bind(this, object.hour, this.props.subadmin.date)}
+            >
+              <i className="fas fa-plus"></i>
+            </button>
+
             <h1 className="d-inline mb-0">{`${object.hour}:00`}</h1>
           </div>
           <div className="row">

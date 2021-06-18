@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 const passport = require('passport');
 const path = require('path');
 
@@ -7,7 +8,6 @@ const path = require('path');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 const xss = require('xss-clean');
-const rateLimit = require('express-rate-limit');
 const hpp = require('hpp');
 const cors = require('cors');
 
@@ -24,7 +24,13 @@ const failRoutes = require('./routes/fail');
 
 const app = express();
 
-app.use(express.json());
+// Body parser middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// import and launch telegram bot
+// const bot = require('./bot');
+// bot.launch();
 
 // DB Config
 const db = require('./config/keys').mongoURI;

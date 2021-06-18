@@ -120,14 +120,14 @@ class Register extends Component {
                   />
                   {this.state.occupation === 'disinfector' ||
                     this.state.occupation === 'subadmin' ? (
-                      <SelectListGroup
-                        name="color"
-                        value={this.state.color}
-                        onChange={this.onChange}
-                        error={errors.color}
-                        options={colorOptions}
-                      />
-                    ) : ''}
+                    <SelectListGroup
+                      name="color"
+                      value={this.state.color}
+                      onChange={this.onChange}
+                      error={errors.color}
+                      options={colorOptions}
+                    />
+                  ) : ''}
                   <TextFieldGroup
                     label="Введите Пароль"
                     type="password"
@@ -144,7 +144,7 @@ class Register extends Component {
                     onChange={this.onChange}
                     error={errors.password2}
                   />
-                  <button type="submit" className="btn btn-success btn-block mt-4" >Создать</button>
+                  <button type="submit" className="btn btn-success btn-block mt-4"><i className="fas fa-user-plus"></i> Создать</button>
                 </form>
               </div>
             </div>

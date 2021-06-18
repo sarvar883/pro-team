@@ -47,7 +47,7 @@ class Navbar extends Component {
 
         <li className="nav-item list-inline-item">
           <Link to="/login" onClick={this.onLogoutClick} className="nav-link logout">
-            Logout
+            <i className="fas fa-sign-out-alt"></i> Logout
           </Link>
         </li>
       </div>
@@ -81,7 +81,7 @@ class Navbar extends Component {
               <Link className="nav-link" to="/returned-queries">Возвращенные Запросы</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/fail/see">Некачественные Заказы</Link>
+              <Link className="nav-link" to="/fail/see">Некач. и Повт. Заказы</Link>
             </li>
             {/* {showRefreshButtton} */}
           </div>
@@ -108,13 +108,25 @@ class Navbar extends Component {
     const operatorLinks = (
       <div className="operatorLinks">
         <div className="dropdown">
-          <button type="button" className="btn btn-primary dropdown-toggle align-baseline mr-2" data-toggle="dropdown">Функции</button>
+          <button type="button" className="btn btn-primary dropdown-toggle align-baseline mr-2" data-toggle="dropdown">Стат.</button>
           <div className="dropdown-menu">
             <li className="nav-item">
               <Link className="nav-link" to="/operator/stats">Статистика</Link>
             </li>
             <li className="nav-item">
+              <Link className="nav-link" to="/fail/see">Некач. и Повт. Заказы</Link>
+            </li>
+          </div>
+        </div>
+
+        <div className="dropdown">
+          <button type="button" className="btn btn-primary dropdown-toggle align-baseline mr-2" data-toggle="dropdown">Функции</button>
+          <div className="dropdown-menu">
+            <li className="nav-item">
               <Link className="nav-link" to="/operator/order-queries">Запросы</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/clients">Клиенты</Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/operator/repeat-orders">Повторные продажи</Link>
@@ -124,12 +136,6 @@ class Navbar extends Component {
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/search-orders">Поиск заказов</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/clients">Клиенты</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/fail/see">Некачественные Заказы</Link>
             </li>
             {/* {showRefreshButtton} */}
           </div>
@@ -168,13 +174,13 @@ class Navbar extends Component {
               <Link className="nav-link" to="/accountant/queries">Запросы</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/search-orders">Поиск заказов</Link>
-            </li>
-            <li className="nav-item">
               <Link className="nav-link" to="/clients">Клиенты</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/fail/see">Некачественные Заказы</Link>
+              <Link className="nav-link" to="/search-orders">Поиск заказов</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/fail/see">Некач. и Повт. Заказы</Link>
             </li>
             {/* {showRefreshButtton} */}
           </div>
@@ -186,13 +192,32 @@ class Navbar extends Component {
     const subadminLinks = (
       <div className="subadminLinks">
         <div className="dropdown">
+          <button type="button" className="btn btn-primary dropdown-toggle align-baseline mr-2" data-toggle="dropdown">Стат.</button>
+          <div className="dropdown-menu">
+            <li className="nav-item">
+              <Link className="nav-link" to="/subadmin/stats">Ваша Стат.</Link>
+            </li>
+
+            <li className="nav-item">
+              <Link className="nav-link" to="/admin/stats">Общая Стат.</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/admin/disinf-stats">Стат. Дезинфекторов</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/admin/operator-stats">Стат. Оператора / Админа</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/admin/adv-stats">Стат. Рекламы</Link>
+            </li>
+          </div>
+        </div>
+
+        <div className="dropdown">
           <button type="button" className="btn btn-primary dropdown-toggle align-baseline mr-2" data-toggle="dropdown">Функции</button>
           <div className="dropdown-menu">
             <li className="nav-item">
               <Link className="nav-link" to="/subadmin/orders">Ваши Заказы</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/subadmin/stats">Статистика</Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/subadmin/queries">Запросы</Link>
@@ -207,7 +232,7 @@ class Navbar extends Component {
               <Link className="nav-link" to="/clients">Клиенты</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/fail/see">Некачественные Заказы</Link>
+              <Link className="nav-link" to="/fail/see">Некач. и Повт. Заказы</Link>
             </li>
             {/* {showRefreshButtton} */}
           </div>
@@ -271,7 +296,7 @@ class Navbar extends Component {
               <Link className="nav-link" to="/clients">Клиенты</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/fail/see">Некачественные Заказы</Link>
+              <Link className="nav-link" to="/fail/see">Некач. и Повт. Заказы</Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/not-completed-orders">Невып. Заказы</Link>
@@ -323,12 +348,14 @@ class Navbar extends Component {
     return (
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary pt-0 pb-0" id="navbar">
         <div className="container pt-2 pb-2 pl-0 pr-0">
-          <Link to={`/${user.occupation}`} className="navbar-brand p-2">Pro Team</Link>
+          <Link to={`/${user.occupation}`} className="navbar-brand p-2">ProDez</Link>
+
           {this.props.options.theme === 'light' ? (
             <button className="navbar-brand" onClick={() => this.changeTheme('dark')}><i className="fas fa-moon"></i></button>
           ) : (
-              <button className="navbar-brand" onClick={() => this.changeTheme('light')}><i className="fas fa-sun"></i></button>
-            )}
+            <button className="navbar-brand" onClick={() => this.changeTheme('light')}><i className="fas fa-sun"></i></button>
+          )}
+
           <button
             className="navbar-toggler"
             type="button"

@@ -19,76 +19,86 @@ exports.disinfectorGetsHisOwnStats = async (req, res) => {
     timeObject = dayHelper(req.body.object.day);
   }
 
+
+  // приходы материалов
+  let addedMaterials = [];
+  // заказы, которые дезинфектор принял
   let acceptedOrders = [];
+  // заказы, которые дезинфектор исполнил
+  let ordersHePerformed = [];
 
-  let addedMaterials = await AddMaterial.find({
-    disinfector: id,
-    $and: [
-      { createdAt: { '$gte': timeObject.min } },
-      { createdAt: { '$lt': timeObject.max } }
-    ]
-  })
-    // .populate('disinfector admin')
-    .populate({
-      path: 'disinfector',
-      select: 'name occupation'
-    })
-    .populate({
-      path: 'admin',
-      select: 'name occupation'
-    })
-    .exec();
 
-  Order.find({
-    $and: [
-      { dateFrom: { '$gte': timeObject.min } },
-      { dateFrom: { '$lt': timeObject.max } }
-    ],
-    $or: [
-      { disinfectorId: id },
-      { "disinfectors.user": id },
-      { userAcceptedOrder: id }
-    ]
-  })
-    // .populate('userAcceptedOrder disinfectors.user')
-    .populate({
-      path: 'userAcceptedOrder',
-      select: 'name occupation'
+  try {
+    addedMaterials = await AddMaterial.find({
+      disinfector: id,
+      $and: [
+        { createdAt: { '$gte': timeObject.min } },
+        { createdAt: { '$lt': timeObject.max } }
+      ]
     })
-    .populate({
-      path: 'disinfectors.user',
-      select: 'name occupation'
+      // .populate('disinfector admin')
+      .populate({
+        path: 'disinfector',
+        select: 'name occupation'
+      })
+      .populate({
+        path: 'admin',
+        select: 'name occupation'
+      })
+      .exec()
+
+
+    // заказы, которые дезинфектор принял
+    acceptedOrders = await Order.find({
+      userAcceptedOrder: id,
+      $and: [
+        { dateFrom: { '$gte': timeObject.min } },
+        { dateFrom: { '$lt': timeObject.max } }
+      ]
     })
-    .exec()
-    .then(orders => {
+      .populate({
+        path: 'disinfectors.user',
+        select: 'name occupation'
+      })
+      .populate({
+        path: 'userAcceptedOrder',
+        select: 'name occupation'
+      })
+      .exec();
 
-      acceptedOrders = orders.filter(item =>
-        item.userAcceptedOrder &&
-        item.userAcceptedOrder._id.toString() === id
-      );
 
-      orders = orders.filter(item => {
-        let amongDisinfectors = 0;
-        item.disinfectors.forEach(element => {
-          if (element.user._id.toString() === id) amongDisinfectors++;
-        });
-        if (item.disinfectorId._id.toString() === id || amongDisinfectors > 0) {
-          return true;
-        } else {
-          return false;
-        }
-      });
-
-      return res.json({
-        orders: orders,
-        acceptedOrders: acceptedOrders,
-        addedMaterials: addedMaterials
-      });
+    // заказы, которые дезинфектор исполнил
+    ordersHePerformed = await Order.find({
+      $and: [
+        { dateFrom: { '$gte': timeObject.min } },
+        { dateFrom: { '$lt': timeObject.max } }
+      ],
+      $or: [
+        { disinfectorId: id },
+        { "disinfectors.user": id },
+      ]
     })
-    .catch(err => {
-      console.log('disinfectorGetsHisOwnStats ERROR', err);
-      res.status(404).json(err);
+      .populate({
+        path: 'disinfectors.user',
+        select: 'name occupation'
+      })
+      .populate({
+        path: 'userAcceptedOrder',
+        select: 'name occupation'
+      })
+      .exec();
+
+
+    return res.json({
+      orders: ordersHePerformed,
+      acceptedOrders,
+      addedMaterials
     });
+
+  } catch (err) {
+    console.log('disinfectorGetsHisOwnStats ERROR', err);
+    res.status(404).json(err);
+  }
 };
 
 
@@ -109,6 +119,7 @@ exports.genStatsForAdmin = (req, res) => {
       { dateFrom: { '$lt': timeObject.max } }
     ]
   })
+    // .populate('disinfectorId clientId disinfectors.user')
     .populate({
       path: 'disinfectorId',
       select: 'name occupation'
@@ -121,6 +132,7 @@ exports.genStatsForAdmin = (req, res) => {
       path: 'disinfectors.user',
       select: 'name occupation'
     })
+    // .populate('disinfectorId userCreated clientId userAcceptedOrder disinfectors.user')
     .exec()
     .then(orders => res.json(orders))
     .catch(err => {
@@ -130,7 +142,7 @@ exports.genStatsForAdmin = (req, res) => {
 };
 
 
-exports.disinfectorStatsForAdmin = (req, res) => {
+exports.disinfectorStatsForAdmin = async (req, res) => {
   let { id } = req.body.object;
 
   let timeObject;
@@ -142,57 +154,63 @@ exports.disinfectorStatsForAdmin = (req, res) => {
     timeObject = dayHelper(req.body.object.day);
   }
 
+
+  // заказы, которые дезинфектор принял
   let acceptedOrders = [];
+  // заказы, которые дезинфектор исполнил
+  let ordersHePerformed = [];
 
-  Order.find({
-    $and: [
-      { dateFrom: { '$gte': timeObject.min } },
-      { dateFrom: { '$lt': timeObject.max } }
-    ],
-    $or: [
-      { disinfectorId: id },
-      { "disinfectors.user": id },
-      { userAcceptedOrder: id }
-    ]
-  })
-    .populate({
-      path: 'clientId',
-      select: 'name'
+  try {
+    // заказы, которые дезинфектор принял
+    acceptedOrders = await Order.find({
+      userAcceptedOrder: id,
+      $and: [
+        { dateFrom: { '$gte': timeObject.min } },
+        { dateFrom: { '$lt': timeObject.max } }
+      ]
     })
-    .populate({
-      path: 'disinfectors.user',
-      select: 'name occupation'
+      .populate({
+        path: 'clientId',
+        select: 'name'
+      })
+      .populate({
+        path: 'disinfectors.user',
+        select: 'name occupation'
+      })
+      .exec();
+
+
+    // заказы, которые дезинфектор исполнил
+    ordersHePerformed = await Order.find({
+      $and: [
+        { dateFrom: { '$gte': timeObject.min } },
+        { dateFrom: { '$lt': timeObject.max } }
+      ],
+      $or: [
+        { disinfectorId: id },
+        { "disinfectors.user": id }
+      ]
     })
-    .exec()
-    .then(orders => {
-      acceptedOrders = orders.filter(item =>
-        item.userAcceptedOrder &&
-        item.userAcceptedOrder._id.toString() === id
-      );
+      .populate({
+        path: 'clientId',
+        select: 'name'
+      })
+      .populate({
+        path: 'disinfectors.user',
+        select: 'name occupation'
+      })
+      .exec();
 
-      orders = orders.filter(item => {
 
-        let amongDisinfectors = 0;
-        item.disinfectors.forEach(element => {
-          if (element.user._id.toString() === id) amongDisinfectors++;
-        });
-        if (item.disinfectorId._id.toString() === id || amongDisinfectors > 0) {
-          return true;
-        } else {
-          return false;
-        }
-      });
-
-      return res.json({
-        disinfectorId: id,
-        orders,
-        acceptedOrders
-      });
-    })
-    .catch(err => {
-      console.log('disinfectorStatsForAdmin ERROR', err);
-      res.status(404).json(err);
+    return res.json({
+      disinfectorId: id,
+      orders: ordersHePerformed,
+      acceptedOrders
     });
+  } catch (err) {
+    console.log('disinfectorStatsForAdmin ERROR', err);
+    res.status(404).json(err);
+  }
 };
 
 
@@ -213,6 +231,7 @@ exports.getAdvStats = (req, res) => {
     clientType: 1,
     completed: 1,
     failed: 1,
+    prevFailedOrder: 1,
     advertising: 1,
     operatorDecided: 1,
     operatorConfirmed: 1,
@@ -248,6 +267,7 @@ exports.getOperatorStats = (req, res) => {
       { dateFrom: { '$lt': timeObject.max } }
     ]
   })
+    // .populate('disinfectorId clientId disinfectors.user')
     .populate({
       path: 'disinfectorId',
       select: 'name occupation'
@@ -274,7 +294,6 @@ exports.getOperatorStats = (req, res) => {
 };
 
 
-
 exports.getUserMatComing = (req, res) => {
   let timeObject;
   if (req.body.object.type === 'month') {
@@ -290,6 +309,7 @@ exports.getUserMatComing = (req, res) => {
       { createdAt: { '$lt': timeObject.max } }
     ]
   })
+    // .populate('admin')
     .populate({
       path: 'admin',
       select: 'name occupation'
@@ -318,6 +338,7 @@ exports.getUserMatDistrib = (req, res) => {
       { createdAt: { '$lt': timeObject.max } }
     ]
   })
+    // .populate('disinfector')
     .populate({
       path: 'disinfector',
       select: 'name occupation'

@@ -4,7 +4,11 @@ import { connect } from 'react-redux';
 import Spinner from '../common/Spinner';
 
 import { getAllUsers } from '../../actions/orderActions';
-import { changePassword, disableUser } from '../../actions/adminActions';
+import {
+  changePassword,
+  disableUser,
+  setUserById
+} from '../../actions/adminActions';
 
 class Users extends Component {
   state = {
@@ -13,6 +17,16 @@ class Users extends Component {
     password1: '',
     password2: ''
   };
+
+  // componentDidMount() {
+  //   if (this.props.admin.users && this.props.admin.users.length > 0) {
+  //     this.setState({
+  //       users: this.props.admin.users
+  //     });
+  //   } else {
+  //     this.props.getAllUsers();
+  //   }
+  // }
 
   componentDidMount() {
     this.props.getAllUsers();
@@ -73,6 +87,11 @@ class Users extends Component {
     this.props.disableUser(object, this.props.history);
   };
 
+  changeMaterials = (user) => {
+    this.props.setUserById(user);
+    this.props.history.push(`/admin/set-disinfector-materials/${user._id}`);
+  };
+
   render() {
     let userOptions = [{
       label: '- Выберите Пользователя -- ', value: ''
@@ -92,12 +111,35 @@ class Users extends Component {
                 <li>E-mail: {user.email}</li>
                 <li>Телефон: {user.phone}</li>
                 <li>Должность: {user.occupation}</li>
-                <li>Цвет (в календаре): {user.color ? user.color : '--'}</li>
+                <li>Цвет (в календаре): {user.color || '--'}</li>
               </ul>
 
-              <Link to={`/admin/edit-user/${user._id}`} className="btn btn-dark mt-2">Редактировать</Link>
+              <Link
+                to={`/admin/edit-user/${user._id}`}
+                className="btn btn-dark mt-2 mr-2"
+              >
+                <i className="fas fa-user-edit"></i> Редактировать
+              </Link>
 
-              <button className="btn btn-danger mt-2 ml-3" onClick={() => { if (window.confirm(`Вы уверены удалить пользователя ${user.occupation} ${user.name}?`)) { this.deleteUser(user._id) } }}>Удалить</button>
+              {['subadmin', 'disinfector'].includes(user.occupation) && (
+                <button
+                  className="btn btn-primary mt-2 mr-2"
+                  onClick={() => this.changeMaterials(user)}
+                >
+                  <i className="fas fa-syringe"></i> Изменить материалы
+                </button>
+              )}
+
+              <button
+                className="btn btn-danger mt-2 mr-2"
+                onClick={() => {
+                  if (window.confirm(`Вы уверены удалить пользователя ${user.occupation} ${user.name}?`)) {
+                    this.deleteUser(user._id)
+                  }
+                }}
+              >
+                <i className="fas fa-trash-alt"></i> Удалить
+              </button>
 
             </div>
           </div>
@@ -109,7 +151,7 @@ class Users extends Component {
       <div className="container-fluid">
         <div className="row">
           <div className="col-12">
-            <h1 className="text-center">Все Пользователи</h1>
+            <h2 className="text-center">Все Пользователи</h2>
           </div>
         </div>
 
@@ -118,7 +160,7 @@ class Users extends Component {
 
             <div className="row mt-1">
               <div className="col-12">
-                <button type="button" className="btn btn-primary mt-2" data-toggle="modal" data-target='#changePassword'>Поменять пароль Пользователя</button>
+                <button type="button" className="btn btn-primary mt-2" data-toggle="modal" data-target='#changePassword'><i className="fas fa-key"></i> Изменить пароль Пользователя</button>
 
                 <div className="modal fade" id='changePassword'>
                   <div className="modal-dialog">
@@ -128,7 +170,7 @@ class Users extends Component {
                       </div>
 
                       <div className="modal-body">
-                        <h4 className="modal-title">Поменять Пароль Пользователя</h4>
+                        <h4 className="modal-title"><i className="fas fa-key"></i> Изменить Пароль Пользователя</h4>
                         <form onSubmit={this.changePassword}>
                           <div className="form-group">
                             <select className="form-control" name="userId" onChange={this.onChange} value={this.state.userId} required>
@@ -145,7 +187,7 @@ class Users extends Component {
                             <label htmlFor="password2">Повторите Пароль:</label>
                             <input type="password" name="password2" className="form-control" onChange={this.onChange} value={this.state.password2} required />
                           </div>
-                          <button type="submit" className="btn btn-success">Поменять Пароль</button>
+                          <button type="submit" className="btn btn-success"><i className="fas fa-copyright"></i> Изменить Пароль</button>
                         </form>
                       </div>
 
@@ -172,4 +214,4 @@ const mapStateToProps = (state) => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps, { getAllUsers, changePassword, disableUser })(withRouter(Users));
+export default connect(mapStateToProps, { getAllUsers, changePassword, disableUser, setUserById })(withRouter(Users));

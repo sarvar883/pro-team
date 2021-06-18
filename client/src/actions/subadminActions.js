@@ -17,7 +17,12 @@ import {
 // get orders that subadmin should complete
 export const getSubadmOrders = (id) => (dispatch) => {
   dispatch(setSubadminLoading());
-  axios.post('/subadmin/get-my-orders', { id: id })
+
+
+  // 21.04.2021 now subadmin and disinfector refer to the same endpoint 
+  // to get orders they should complete
+  axios.post('/order/get-my-orders', { userId: id })
+    // axios.post('/subadmin/get-my-orders', { id: id })
     .then(res =>
       dispatch({
         type: SUBADM_GET_MY_ORDERS,
@@ -54,7 +59,14 @@ export const getSortedOrders = (date) => (dispatch) => {
 
 export const getAllDisinfectors = () => (dispatch) => {
   dispatch(setSubadminLoading());
-  axios.post('/subadmin/get-all-disinfectors')
+
+  const object = {
+    method: 'role',
+    roles: ['disinfector']
+  };
+
+  // axios.post('/subadmin/get-all-disinfectors')
+  axios.post('/get-users', { object })
     .then(res =>
       dispatch({
         type: ALL_DISINFECTORS,

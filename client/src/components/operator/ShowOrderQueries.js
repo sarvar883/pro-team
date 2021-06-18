@@ -11,7 +11,10 @@ class ShowOrderQueries extends Component {
   };
 
   componentDidMount() {
-    if (this.props.operator.completeOrders && this.props.operator.completeOrders.length > 0) {
+    if (
+      this.props.operator.completeOrders &&
+      this.props.operator.completeOrders.length > 0
+    ) {
       this.setState({
         completeOrders: this.props.operator.completeOrders
       });
@@ -20,10 +23,18 @@ class ShowOrderQueries extends Component {
 
   render() {
     let completeOrders = this.state.completeOrders.map((order, index) =>
-      <div className="col-lg-4 col-md-6" key={index}>
+      <div className="col-lg-4 col-md-6 mt-2" key={index}>
         <div className="card order mt-2">
           <div className="card-body p-0">
             <ul className="font-bold mb-0 list-unstyled">
+              {order.prevFailedOrder && (
+                <li><h4><i className="fas fas fa-exclamation"></i> Повторный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+              )}
+
+              {order.failed && (
+                <li><h4><i className="fas fas fa-exclamation"></i> Некачественный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+              )}
+
               {order.returnedBack && (
                 <li className="text-danger">Это возвращенный заказ</li>
               )}
@@ -31,8 +42,6 @@ class ShowOrderQueries extends Component {
               {order.disinfectorId && (
                 <li>Ответственный: {order.disinfectorId.occupation} {order.disinfectorId.name}</li>
               )}
-
-              {order.failed && <li className="text-danger">Это некачественный заказ</li>}
 
               {order.clientType === 'corporate' ?
                 <React.Fragment>
@@ -53,10 +62,12 @@ class ShowOrderQueries extends Component {
               <li className="text-danger">Время выполнения: С <Moment format="HH:mm">{order.dateFrom}</Moment> ПО <Moment format="HH:mm">{order.completedAt}</Moment></li>
               <li>Адрес: {order.address}</li>
               <li>Тип услуги: {order.typeOfService}</li>
+              <li>Срок гарантии (в месяцах): {order.guarantee}</li>
+
               <li>Форма Выполнения Заказа заполнена: <Moment format="DD/MM/YYYY HH:mm">{order.completedAt}</Moment></li>
             </ul>
 
-            <Link to={`/order-confirm/${order._id}`} className="btn btn-dark mt-2">Форма Подтверждения</Link>
+            <Link to={`/order-confirm/${order._id}`} className="btn btn-dark mt-2"><i className="fab fa-wpforms"></i> Форма Подтверждения</Link>
           </div>
         </div>
       </div>
@@ -66,7 +77,7 @@ class ShowOrderQueries extends Component {
       <React.Fragment>
         <div className="row">
           <div className="col-12">
-            <h1 className="text-center">Выполненные Заказы</h1>
+            <h2 className="text-center">Выполненные Заказы</h2>
           </div>
 
           <div className="col-12 mt-2">
@@ -74,8 +85,8 @@ class ShowOrderQueries extends Component {
               className="btn btn-primary"
               onClick={() => this.props.getCompleteOrders(this.props.auth.user.id)}
             >
-              Обновить запросы
-              </button>
+              <i className="fas fa-redo-alt"></i> Обновить запросы
+            </button>
           </div>
 
           {completeOrders}

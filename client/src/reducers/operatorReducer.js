@@ -6,6 +6,7 @@ import {
   DELETE_QUERY_FROM_STATE,
   GOT_STATS_FOR_OPERATOR,
   GET_REPEAT_ORDERS,
+  SET_REPEAT_ORDER_SEARCH_VARS,
   SET_LOADING_SORTED_ORDERS,
   SET_LOADING_COMPLETE_ORDERS,
   SET_LOADING_OPERATOR_STATS
@@ -15,6 +16,11 @@ const initialState = {
   sortedOrders: [],
   completeOrders: [],
   repeatOrders: [],
+  repeatOrderSearchVars: {
+    method: '',
+    headingDay: '',
+    selectedDays: []
+  },
   orderToConfirm: {
     orderId: {},
     disinfectorId: {},
@@ -25,7 +31,10 @@ const initialState = {
     },
     disinfectors: [],
     prevFailedOrder: {},
-    nextOrderAfterFail: {}
+    nextOrdersAfterFailArray: [],
+
+    // we no longer use this field
+    nextOrderAfterFail: {},
   },
   stats: {
     sortedOrders: [],
@@ -108,6 +117,17 @@ export default function (state = initialState, action) {
         ...state,
         loadingSortedOrders: false,
         repeatOrders: action.payload
+      };
+
+    case SET_REPEAT_ORDER_SEARCH_VARS:
+      return {
+        ...state,
+        repeatOrderSearchVars: {
+          ...state.repeatOrderSearchVars,
+          method: action.payload.method,
+          headingDay: action.payload.headingDay,
+          selectedDays: action.payload.selectedDays,
+        }
       };
 
     default:

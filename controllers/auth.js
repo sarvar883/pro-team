@@ -8,6 +8,7 @@ const materials = require('../client/src/components/common/materials');
 const validateRegisterInput = require('../validation/register');
 const validateLoginInput = require('../validation/login');
 
+
 exports.registerUser = async (req, res) => {
   let { errors, isValid } = validateRegisterInput(req.body);
 
@@ -164,6 +165,28 @@ exports.getUserById = (req, res) => {
       console.log('getUserById ERROR', err);
       return res.status(404).json(err);
     });
+};
+
+
+// NEW UNIVERSAL FUNCTION
+exports.getUsers = async (req, res) => {
+  const method = req.body.object.method || 'all';
+  const roles = req.body.object.roles || [];
+
+  let query;
+
+  if (method === 'all') {
+    query = User.find({ disabled: false });
+  } else if (method === 'role') {
+    query = User.find({
+      disabled: false,
+      occupation: { $in: roles }
+    });
+  }
+
+  const users = await query || [];
+
+  return res.json(users);
 };
 
 

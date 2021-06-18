@@ -87,7 +87,6 @@ class DisMatCom extends Component {
   };
 
 
-
   // weekly calendar
   handleDayChange = date => {
     const object = {
@@ -131,7 +130,6 @@ class DisMatCom extends Component {
   // end of weekly calendar
 
 
-
   render() {
     const { monthLabels, yearLabels } = getMonthAndYearLabels();
 
@@ -141,7 +139,6 @@ class DisMatCom extends Component {
     const monthOptions = monthLabels.map((month, index) =>
       <option value={month.value} key={index}>{month.label}</option>
     );
-
 
 
     // weekly calender
@@ -163,7 +160,6 @@ class DisMatCom extends Component {
     // end of calendar
 
 
-
     return (
       <div className="container-fluid" >
         <div className="row">
@@ -182,11 +178,11 @@ class DisMatCom extends Component {
                   {monthOptions}
                 </select>
               </div>
-              <button type="submit" className="btn btn-success">Искать</button>
+              <button type="submit" className="btn btn-success mr-1 mt-1"><i className="fas fa-search"></i> Искать</button>
 
-              <button type="button" className="btn btn-danger ml-2" onClick={() => this.getSpecificMonthStats('current')}>Этот месяц</button>
+              <button type="button" className="btn btn-danger mr-1 mt-1" onClick={() => this.getSpecificMonthStats('current')}>Этот месяц</button>
 
-              <button type="button" className="btn btn-primary ml-2" onClick={() => this.getSpecificMonthStats('previous')}>Прошлый месяц</button>
+              <button type="button" className="btn btn-primary mr-1 mt-1" onClick={() => this.getSpecificMonthStats('previous')}>Прошлый месяц</button>
             </form>
           </div>
 

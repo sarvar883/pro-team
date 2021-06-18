@@ -97,7 +97,6 @@ class ClientId extends Component {
   };
 
 
-
   // weekly calendar
   handleDayChange = date => {
     const object = {
@@ -151,7 +150,6 @@ class ClientId extends Component {
   // end of weekly calendar
 
 
-
   render() {
     // weekly calender
     const { hoverRange, selectedDays } = this.state;
@@ -185,23 +183,37 @@ class ClientId extends Component {
       if (item.completed && item.operatorDecided) {
         operatorDecidedOrders.push(item);
 
-        if (item.operatorConfirmed && (item.adminConfirmed || item.accountantConfirmed)) {
+        if (
+          !item.failed &&
+          // исключаем некачественные и повторные заказы
+          !item.hasOwnProperty('prevFailedOrder') &&
+          item.operatorConfirmed &&
+          (item.adminConfirmed || item.accountantConfirmed)
+        ) {
           confirmedOrders.push(item);
           totalSum += item.cost;
           totalScore += item.score;
         }
 
-        if (item.clientType === 'corporate') {
-          if (!item.operatorConfirmed || (item.accountantDecided && !item.accountantConfirmed)) {
-            rejectedOrders.push(item);
-          }
-        } else if (item.clientType === 'individual') {
-          if (!item.operatorConfirmed || (item.adminDecided && !item.adminConfirmed)) {
-            rejectedOrders.push(item);
-          }
+        if (
+          (item.operatorDecided && !item.operatorConfirmed) ||
+          (item.accountantDecided && !item.accountantConfirmed) ||
+          (item.adminDecided && !item.adminConfirmed)
+        ) {
+          rejectedOrders.push(item);
         }
-      }
 
+        //   if (item.clientType === 'corporate') {
+        //     if (!item.operatorConfirmed || (item.accountantDecided && !item.accountantConfirmed)) {
+        //       rejectedOrders.push(item);
+        //     }
+        //   } else if (item.clientType === 'individual') {
+        //     if (!item.operatorConfirmed || (item.adminDecided && !item.adminConfirmed)) {
+        //       rejectedOrders.push(item);
+        //     }
+        //   }
+
+      }
     });
 
 
@@ -247,7 +259,7 @@ class ClientId extends Component {
 
 
     let renderExistingContracts = client.contracts.map((item, index) =>
-      <li className="mb-3" key={index}>Договор: {item} <button className="btn btn-danger ml-3" onClick={() => this.handleContractCRUD('delete', item)}>Удалить</button></li>
+      <li className="mb-3" key={index}>Договор: {item} <button className="btn btn-danger ml-3" onClick={() => this.handleContractCRUD('delete', item)}><i className="fas fa-trash-alt"></i> Удалить</button></li>
     );
 
     return (
@@ -301,7 +313,7 @@ class ClientId extends Component {
                         <li>Общая Сумма: {totalSum.toLocaleString()} UZS</li>
                       }
                     </ul>
-                    <Link to={`/edit-client/${client._id}`} className="btn btn-warning mt-2">Редактировать Клиента</Link>
+                    <Link to={`/edit-client/${client._id}`} className="btn btn-warning mt-2"><i className="fas fa-edit"></i> Редактировать Клиента</Link>
                   </div>
                 </div>
               </div>
@@ -328,7 +340,7 @@ class ClientId extends Component {
                           <div className="form-group">
                             <input type="text" name="contract" className="form-control" onChange={this.onChange} value={this.state.contract} placeholder="Введите Номер Договора" required />
                           </div>
-                          <button type="submit" className="btn btn-success">Добавить</button>
+                          <button type="submit" className="btn btn-success"><i className="fas fa-plus-circle"></i> Добавить</button>
                         </form>
                       </div>
                     </div>
@@ -370,7 +382,7 @@ class ClientId extends Component {
                 <label htmlFor="day"><strong>Выберите День:</strong></label>
                 <input type="date" name="day" className="form-control" onChange={this.onChange} required />
               </div>
-              <button type="submit" className="btn btn-primary">Искать</button>
+              <button type="submit" className="btn btn-primary"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 

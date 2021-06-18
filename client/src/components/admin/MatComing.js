@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Spinner from '../common/Spinner';
 import Moment from 'react-moment';
@@ -160,7 +160,14 @@ class MatComing extends Component {
                   <h3 className="text-center">Сейчас имеется материалов на складе</h3>
                   <ul className="font-bold mb-0 list-unstyled">
                     {renderCurMat}
-                    <li>Последнее обновление: <Moment format="DD/MM/YYYY HH:mm">{this.props.admin.currentMaterials.lastUpdated}</Moment></li>
+                    <li className="mt-2">Последнее обновление: <Moment format="DD/MM/YYYY HH:mm">{this.props.admin.currentMaterials.lastUpdated}</Moment></li>
+
+                    <Link
+                      to='/admin/set-current-materials'
+                      className="btn btn-warning mt-2"
+                    >
+                      <i className="fas fa-marker"></i> Изменить материалы на складе
+                    </Link>
                   </ul>
                 </div>
               </div>
@@ -170,17 +177,17 @@ class MatComing extends Component {
           <div className="col-lg-6 col-md-8">
             <div className="card mt-2">
               <div className="card-body">
-                <h2 className="text-center">Приход Материалов</h2>
+                <h3 className="text-center">Приход Материалов</h3>
                 <form onSubmit={this.onSubmit}>
                   <label htmlFor="consumption">Выберите Материал и Количество:</label>
                   {renderMaterials}
-                  {this.state.array.length < materials.length ? <button className="btn btn-primary mr-2 mt-2" onClick={this.addMaterial}>Добавить Материал</button> : ''}
+                  {this.state.array.length < materials.length ? <button className="btn btn-primary mr-2 mt-2" onClick={this.addMaterial}><i className="fas fa-plus"></i> Добавить Материал</button> : ''}
 
-                  {this.state.array.length === 1 ? '' : <button className="btn btn-danger mt-2" onClick={this.deleteMaterial}>Удалить последний материал</button>}
+                  {this.state.array.length === 1 ? '' : <button className="btn btn-danger mt-2" onClick={this.deleteMaterial}><i className="fas fa-trash-alt"></i> Удалить последний материал</button>}
 
                   <div className="border-bottom"></div>
 
-                  <button type="submit" className="btn btn-success">Добавить приход материалов</button>
+                  <button type="submit" className="btn btn-success"><i className="fas fa-plus-circle"></i> Добавить приход материалов</button>
                 </form>
               </div>
             </div>

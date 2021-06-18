@@ -42,6 +42,7 @@ class MaterialHistory extends Component {
       month: Number(thisMonth),
       year: Number(thisYear)
     };
+    // this.props.getAddMaterialEventsMonth(thisMonth, thisYear);
     this.props.getAddMaterialEvents(object);
 
     this.props.getAllDisinfectorsAndSubadmins();
@@ -60,6 +61,7 @@ class MaterialHistory extends Component {
       month: Number(this.state.month),
       year: Number(this.state.year)
     };
+    // this.props.getAddMaterialEventsMonth(this.state.month, this.state.year);
     this.props.getAddMaterialEvents(object);
 
     this.setState({
@@ -88,6 +90,7 @@ class MaterialHistory extends Component {
       type: 'week',
       days: getWeekDays(getWeekRange(date).from)
     };
+    // this.props.getAddMaterialEventsWeek(getWeekDays(getWeekRange(date).from));
     this.props.getAddMaterialEvents(object);
 
     this.setState({
@@ -112,6 +115,7 @@ class MaterialHistory extends Component {
       type: 'week',
       days: getWeekDays(getWeekRange(days[0]).from)
     };
+    // this.props.getAddMaterialEventsWeek(getWeekDays(getWeekRange(days[0]).from));
     this.props.getAddMaterialEvents(object);
 
     this.setState({
@@ -119,7 +123,6 @@ class MaterialHistory extends Component {
     });
   };
   // end of weekly calendar
-
 
 
   render() {
@@ -152,7 +155,6 @@ class MaterialHistory extends Component {
     // end of calendar
 
 
-
     return (
       <div className="container-fluid" >
         <div className="row">
@@ -171,7 +173,7 @@ class MaterialHistory extends Component {
                   {monthOptions}
                 </select>
               </div>
-              <button type="submit" className="btn btn-success mr-1 mt-1">Искать</button>
+              <button type="submit" className="btn btn-success mr-1 mt-1"><i className="fas fa-search"></i> Искать</button>
 
               <button type="button" className="btn btn-danger mr-1 mt-1" onClick={() => this.getSpecificMonthStats('current')}>Этот месяц</button>
 

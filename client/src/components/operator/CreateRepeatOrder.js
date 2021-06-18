@@ -2,11 +2,19 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Spinner from '../common/Spinner';
+
 import TextFieldGroup from '../common/TextFieldGroup';
 import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
-import advertisements from '../common/advertisements';
 
-import { getAllUsers, getRepeatOrderForm, createRepeatOrder } from '../../actions/orderActions';
+import advertisements from '../common/advertisements';
+import orderTypes from '../common/orderTypes';
+
+import {
+  getAllUsers,
+  getRepeatOrderForm,
+  createRepeatOrder
+} from '../../actions/orderActions';
+
 
 class CreateRepeatOrder extends Component {
   state = {
@@ -22,7 +30,8 @@ class CreateRepeatOrder extends Component {
     phone: '',
     hasSecondPhone: false,
     phone2: '',
-    typeOfService: '',
+    // typeOfService: '',
+    typeOfService: [],
     advertising: '',
     comment: ''
   };
@@ -31,6 +40,19 @@ class CreateRepeatOrder extends Component {
     this.props.getRepeatOrderForm(this.props.match.params.orderId);
     this.props.getAllUsers();
     window.scrollTo({ top: 0 });
+
+    let array = [];
+
+    orderTypes.forEach(object => {
+      array.push({
+        type: object.value,
+        selected: false
+      });
+    });
+
+    this.setState({
+      typeOfService: array
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -49,6 +71,33 @@ class CreateRepeatOrder extends Component {
         });
       }
 
+
+
+      let array = [];
+      orderTypes.forEach(object => {
+        array.push({
+          type: object.value,
+          selected: false
+        });
+      });
+
+      // service type array
+      let arraySelectedItems = [];
+      // to prevent bugs
+      if (newOrder.typeOfService && newOrder.typeOfService.length > 0) {
+        arraySelectedItems = newOrder.typeOfService.split(',');
+
+        array.forEach(item => {
+          arraySelectedItems.forEach(element => {
+            if (item.type === element.trim()) {
+              item.selected = true;
+            }
+          });
+        });
+      }
+
+
+
       this.setState({
         disinfectorId: newOrder.disinfectorId._id ? newOrder.disinfectorId._id : '',
         clientType: newOrder.clientType ? newOrder.clientType : '',
@@ -57,7 +106,8 @@ class CreateRepeatOrder extends Component {
 
         address: newOrder.address ? newOrder.address : '',
         phone: newOrder.phone ? newOrder.phone : '',
-        typeOfService: newOrder.typeOfService ? newOrder.typeOfService : '',
+        // typeOfService: newOrder.typeOfService ? newOrder.typeOfService : '',
+        typeOfService: array,
         advertising: newOrder.advertising ? newOrder.advertising : '',
         userAcceptedOrder: newOrder.userAcceptedOrder ? newOrder.userAcceptedOrder._id : '',
       });
@@ -65,6 +115,19 @@ class CreateRepeatOrder extends Component {
   }
 
   onChange = (e) => this.setState({ [e.target.name]: e.target.value });
+
+  onChangeTypes = (e) => {
+    let array = [...this.state.typeOfService];
+    array.forEach(item => {
+      if (item.type === e.target.value) {
+        item.selected = e.target.checked;
+      }
+    });
+
+    this.setState({
+      typeOfService: array
+    });
+  }
 
   toggleSecondPhone = (e) => {
     e.preventDefault();
@@ -97,12 +160,30 @@ class CreateRepeatOrder extends Component {
       }
     }
 
+
+
+    let serviceTypeString = '', selectedItems = 0;
+    this.state.typeOfService.forEach(item => {
+      if (item.selected) {
+        selectedItems++;
+        if (selectedItems === 1) {
+          serviceTypeString = serviceTypeString + item.type;
+        } else {
+          serviceTypeString = serviceTypeString + ', ' + item.type;
+        }
+      }
+    });
+
+
+
     if (this.state.phone.length !== 13 || (this.state.hasSecondPhone && this.state.phone2.length !== 13)) {
       alert('Телефонный номер должен содержать 13 символов. Введите в формате +998XXXXXXXXX');
     } else if (this.state.phone[0] !== '+' || (this.state.hasSecondPhone && this.state.phone2[0] !== '+')) {
       alert('Телефонный номер должен начинаться с "+". Введите в формате +998XXXXXXXXX');
     } else if (numberCharacters !== 12 || (this.state.hasSecondPhone && phone2Characters !== 12)) {
       alert('Телефонный номер должен содержать "+" и 12 цифр');
+    } else if (selectedItems === 0) {
+      alert('Выберите тип заказа');
     } else {
       const newOrder = {
         id: this.props.match.params.orderId,
@@ -117,12 +198,13 @@ class CreateRepeatOrder extends Component {
         timeFrom: this.state.timeFrom,
         phone: this.state.phone,
         phone2: this.state.phone2,
-        typeOfService: this.state.typeOfService,
+        typeOfService: serviceTypeString,
         advertising: this.state.advertising,
         comment: this.state.comment,
         userCreated: this.props.auth.user.id,
         userAcceptedOrder: this.state.userAcceptedOrder
       };
+      // console.log(newOrder);
       this.props.createRepeatOrder(newOrder, this.props.history, this.props.auth.user.occupation);
     }
   }
@@ -147,17 +229,6 @@ class CreateRepeatOrder extends Component {
       label: `${worker.name}, ${worker.occupation}`, value: worker._id
     }));
 
-    const orderTypes = [
-      { label: '-- Выберите тип заказа --', value: "" },
-      { label: 'DF', value: 'DF' },
-      { label: 'DZ', value: 'DZ' },
-      { label: 'KL', value: 'KL' },
-      { label: 'TR', value: 'TR' },
-      { label: 'GR', value: 'GR' },
-      { label: 'MX', value: 'MX' },
-      { label: 'KOMP', value: 'KOMP' }
-    ];
-
     const advOptions = [
       { label: '-- Откуда узнали о нас? --', value: "" }
     ];
@@ -169,6 +240,22 @@ class CreateRepeatOrder extends Component {
       });
     });
 
+
+    let renderServiceTypes = this.state.typeOfService.map((item, key) =>
+      <div className="form-check" key={key}>
+        <label className="form-check-label">
+          {item.selected ?
+            <React.Fragment>
+              <input type="checkbox" defaultChecked="checked" className="form-check-input" onChange={this.onChangeTypes} value={item.type} />{item.type}
+            </React.Fragment> :
+            <React.Fragment>
+              <input type="checkbox" className="form-check-input" onChange={this.onChangeTypes} value={item.type} />{item.type}
+            </React.Fragment>}
+        </label>
+      </div>
+    );
+
+
     return (
       <React.Fragment>
         {this.props.order.loadingRepeatOrder ? <Spinner /> : (
@@ -177,14 +264,14 @@ class CreateRepeatOrder extends Component {
               <div className="col-md-8 m-auto">
                 <div className="card">
                   <div className="card-body">
-                    <h1 className="display-5 text-center">Создать Повторный Заказ</h1>
+                    <h2 className="display-5 text-center">Создать Повторный Заказ</h2>
                     <form onSubmit={this.onSubmit}>
                       {this.state.clientType === 'corporate' ? (
-                        <p>Корпоративный Клиент: {this.props.order.repeatOrder.clientId.name}</p>
+                        <h5>Корпоративный Клиент: {this.props.order.repeatOrder.clientId.name}</h5>
                       ) : ''}
 
                       {this.state.clientType === 'individual' ? (
-                        <p>Физический Клиент</p>
+                        <h5>Физический Клиент</h5>
                       ) : ''}
 
                       <TextFieldGroup
@@ -236,20 +323,29 @@ class CreateRepeatOrder extends Component {
                             onChange={this.onChange}
                             required
                           />
-                          <button className="btn btn-danger mb-2" onClick={this.deleteSecondPhone}>Убрать запасной номер телефона</button>
+                          <button className="btn btn-danger mb-2" onClick={this.deleteSecondPhone}><i className="fas fa-minus-circle"></i> Убрать запасной номер телефона</button>
                         </React.Fragment>
                       ) : (
-                          <button className="btn btn-success mb-3" onClick={this.toggleSecondPhone}>Добавить другой номер</button>
-                        )}
+                        <button className="btn btn-success mb-3" onClick={this.toggleSecondPhone}><i className="fas fa-plus-circle"></i> Добавить другой номер</button>
+                      )}
 
-                      <div className="form-group">
+                      {/* <div className="form-group">
                         <label htmlFor="typeOfService">Выберите тип заказа:</label>
                         <select className="form-control" value={this.state.typeOfService} name="typeOfService" onChange={this.onChange} required>
                           {orderTypes.map((item, index) =>
                             <option key={index} value={item.value}>{item.label}</option>
                           )}
                         </select>
+                      </div> */}
+
+
+                      <div className="border-bottom"></div>
+                      <div className="form-group">
+                        <label htmlFor="">Выберите тип заказа (можно выбрать несколько):</label>
+                        {renderServiceTypes}
                       </div>
+                      <div className="border-bottom"></div>
+
 
                       <div className="form-group">
                         <label htmlFor="advertising">Откуда узнали:</label>
@@ -263,15 +359,15 @@ class CreateRepeatOrder extends Component {
                       {this.props.order.loading ? (
                         <p>Дезинфекторы загружаются...</p>
                       ) : (
-                          <div className="form-group">
-                            <label htmlFor="disinfectorId">Выберите Дезинфектора:</label>
-                            <select className="form-control" value={this.state.disinfectorId} name="disinfectorId" onChange={this.onChange} required>
-                              {disinfectorOptions.map((item, index) =>
-                                <option key={index} value={item.value}>{item.label}</option>
-                              )}
-                            </select>
-                          </div>
-                        )}
+                        <div className="form-group">
+                          <label htmlFor="disinfectorId">Выберите Дезинфектора:</label>
+                          <select className="form-control" value={this.state.disinfectorId} name="disinfectorId" onChange={this.onChange} required>
+                            {disinfectorOptions.map((item, index) =>
+                              <option key={index} value={item.value}>{item.label}</option>
+                            )}
+                          </select>
+                        </div>
+                      )}
 
                       <div className="form-group">
                         <label htmlFor="userAcceptedOrder">Кто принял Заказ:</label>
@@ -289,7 +385,7 @@ class CreateRepeatOrder extends Component {
                         onChange={this.onChange}
                         required
                       />
-                      <button type="submit" className="btn btn-primary">Создать Повторный Заказ</button>
+                      <button type="submit" className="btn btn-primary"><i className="fas fa-plus-circle"></i> Создать Повторный Заказ</button>
                     </form>
                   </div>
                 </div>

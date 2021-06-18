@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const orderSchema = new Schema({
   disinfectorId: {
-    // кто выполняет заказ
+    // кому давали заказ
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
@@ -60,7 +60,7 @@ const orderSchema = new Schema({
     default: Date.now
   },
 
-  // repeat order
+  // repeat order (повторная продажа)
   repeatedOrder: {
     type: Boolean,
     default: false
@@ -129,10 +129,25 @@ const orderSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Order'
   },
+
+
+  // --------------------------
+  // do not use this field (nextOrderAfterFail)
+  // this field is replaced by "nextOrdersAfterFailArray" (21.05.2021)
+  // так как некачественные заказы могут иметь несколько повторных заказов
   nextOrderAfterFail: {
     type: Schema.Types.ObjectId,
-    ref: 'Order'
+    ref: 'Order',
   },
+  // --------------------------
+
+  // новый атрибут, который хранит повторные заказы
+  nextOrdersAfterFailArray: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Order',
+    default: []
+  }],
+
 
   // operator
   clientReview: {
@@ -169,6 +184,7 @@ const orderSchema = new Schema({
   accountantCheckedAt: {
     type: Date
   },
+
 
   // for admin
   adminCheckedAt: {

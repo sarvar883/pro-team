@@ -75,7 +75,6 @@ class CreateOrder extends Component {
   onChange = (e) => this.setState({ [e.target.name]: e.target.value });
 
   onSelectClientTypeChange = (e) => {
-    // console.log('select', e);
     this.setState({
       clientId: e.value
     });
@@ -125,6 +124,8 @@ class CreateOrder extends Component {
       }
     }
 
+
+
     let serviceTypeString = '', selectedItems = 0;
     this.state.typeOfService.forEach(item => {
       if (item.selected) {
@@ -132,10 +133,12 @@ class CreateOrder extends Component {
         if (selectedItems === 1) {
           serviceTypeString = serviceTypeString + item.type;
         } else {
-          serviceTypeString = serviceTypeString + ',' + item.type;
+          serviceTypeString = serviceTypeString + ', ' + item.type;
         }
       }
     });
+
+
 
     if (
       this.state.phone.length !== 13 ||
@@ -327,11 +330,11 @@ class CreateOrder extends Component {
                         value={this.state.phone2}
                         onChange={this.onChange}
                       />
-                      <button className="btn btn-danger mb-2" onClick={this.deleteSecondPhone}>Убрать запасной номер телефона</button>
+                      <button className="btn btn-danger mb-2" onClick={this.deleteSecondPhone}><i className="fas fa-minus-circle"></i> Убрать запасной номер телефона</button>
                     </React.Fragment>
                   ) : (
-                      <button className="btn btn-success mb-3" onClick={this.toggleSecondPhone}>Добавить другой номер</button>
-                    )}
+                    <button className="btn btn-success mb-3" onClick={this.toggleSecondPhone}><i className="fas fa-plus-circle"></i> Добавить другой номер</button>
+                  )}
 
                   <TextFieldGroup
                     label="Дата выполнения заказа"
@@ -357,6 +360,8 @@ class CreateOrder extends Component {
                     options={orderTypes}
                   /> */}
 
+
+                  <div className="border-bottom"></div>
                   <label htmlFor="">Выберите тип заказа (можно выбрать несколько):</label>
                   {orderTypes.map((item, key) =>
                     <div className="form-check" key={key}>
@@ -365,6 +370,7 @@ class CreateOrder extends Component {
                       </label>
                     </div>
                   )}
+                  <div className="border-bottom"></div>
 
 
                   <SelectListGroup
@@ -377,14 +383,14 @@ class CreateOrder extends Component {
                   {this.props.order.loading ? (
                     <p>Дезинфекторы загружаются...</p>
                   ) : (
-                      <SelectListGroup
-                        name="disinfectorId"
-                        value={this.state.disinfectorId}
-                        onChange={this.onChange}
-                        error={errors.disinfectorId}
-                        options={disinfectorOptions}
-                      />
-                    )}
+                    <SelectListGroup
+                      name="disinfectorId"
+                      value={this.state.disinfectorId}
+                      onChange={this.onChange}
+                      error={errors.disinfectorId}
+                      options={disinfectorOptions}
+                    />
+                  )}
                   <SelectListGroup
                     name="userAcceptedOrder"
                     value={this.state.userAcceptedOrder}
@@ -399,7 +405,7 @@ class CreateOrder extends Component {
                     onChange={this.onChange}
                     error={errors.comment}
                   />
-                  <button type="submit" className="btn btn-success" >Создать</button>
+                  <button type="submit" className="btn btn-success"><i className="fas fa-plus-circle"></i> Создать</button>
                 </form>
               </div>
             </div>

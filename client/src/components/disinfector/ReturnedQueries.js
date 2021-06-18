@@ -3,6 +3,7 @@ import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Spinner from '../common/Spinner';
 import Moment from 'react-moment';
+
 import { getReturnedQueries } from '../../actions/disinfectorActions';
 
 class ReturnedQueries extends Component {
@@ -48,7 +49,40 @@ class ReturnedQueries extends Component {
               ) : <li>Оператор еще не рассмотрел заявку</li>}
 
 
-              {order.clientType === 'corporate' && !order.accountantDecided ? <li>Бухгалтер еще не рассмотрел заявку</li> : ''}
+
+
+
+
+              {order.accountantDecided ? (
+                <React.Fragment>
+                  <li>Бухгалтер рассмотрел заявку</li>
+                  {order.accountantConfirmed ? (
+                    <React.Fragment>
+                      <li className="text-success">Бухгалтер Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{order.accountantCheckedAt}</Moment>)</li>
+                      <li>Счет-Фактура: {order.invoice ? order.invoice : '--'}</li>
+                      <li>Общая Сумма: {order.cost.toLocaleString()} UZS (каждому по {(order.cost / order.disinfectors.length).toLocaleString()} UZS)</li>
+                    </React.Fragment>
+                  ) : <li className="text-danger">Бухгалтер Отклонил (<Moment format="DD/MM/YYYY HH:mm">{order.accountantCheckedAt}</Moment>)</li>}
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+
+                  {order.adminDecided ? (
+                    <React.Fragment>
+                      <li>Админ рассмотрел заявку</li>
+                      {order.adminConfirmed ? (
+                        <li className="text-success">Админ Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{order.adminCheckedAt}</Moment>)</li>
+                      ) : <li className="text-danger">Админ Отклонил (<Moment format="DD/MM/YYYY HH:mm">{order.adminCheckedAt}</Moment>)</li>}
+                    </React.Fragment>
+                  ) : (
+                    <li>Бухгалтер еще не рассмотрел заявку</li>
+                  )}
+
+                </React.Fragment>
+              )}
+
+
+              {/* {order.clientType === 'corporate' && !order.accountantDecided ? <li>Бухгалтер еще не рассмотрел заявку</li> : ''}
 
               {order.clientType === 'corporate' && order.accountantDecided ?
                 <React.Fragment>
@@ -71,7 +105,12 @@ class ReturnedQueries extends Component {
                     <li className="text-success">Админ Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{order.adminCheckedAt}</Moment>)</li>
                   ) : <li className="text-danger">Админ Отклонил (<Moment format="DD/MM/YYYY HH:mm">{order.adminCheckedAt}</Moment>)</li>}
                 </React.Fragment>
-              ) : ''}
+              ) : ''} */}
+
+
+
+
+
 
               {order.clientType === 'corporate' ?
                 <React.Fragment>
@@ -104,11 +143,11 @@ class ReturnedQueries extends Component {
                       <li>Общая Сумма: {order.cost.toLocaleString()} UZS (каждому по {(order.cost / order.disinfectors.length).toLocaleString()} UZS)</li>
                     </React.Fragment>
                   ) : (
-                      <React.Fragment>
-                        <li>Тип Платежа: Безналичный</li>
-                        <li>Номер Договора: {order.contractNumber}</li>
-                      </React.Fragment>
-                    )}
+                    <React.Fragment>
+                      <li>Тип Платежа: Безналичный</li>
+                      <li>Номер Договора: {order.contractNumber}</li>
+                    </React.Fragment>
+                  )}
                 </React.Fragment>
               ) : ''}
 
@@ -118,13 +157,33 @@ class ReturnedQueries extends Component {
 
               <li>Форма Выполнения Заказа заполнена: <Moment format="DD/MM/YYYY HH:mm">{order.completedAt}</Moment></li>
 
-              {this.props.auth.user.occupation === 'subadmin' ? (
-                <Link to={`/subadmin/order-complete-form/${order._id}`} className="btn btn-primary">Заполнить форму выполнения заново</Link>
-              ) : ''}
+              {/* 21.04.2021 disinfector and subadmin now should have the same order complete form - OrderComplete component */}
+              <Link
+                to={`/order-complete-form/${order._id}`}
+                className="btn btn-primary"
+              >
+                <i className="fab fa-wpforms"></i> Заполнить форму выполнения заново
+              </Link>
 
-              {this.props.auth.user.occupation === 'disinfector' ? (
-                <Link to={`/order-complete-form/${order._id}`} className="btn btn-primary">Заполнить форму выполнения заново</Link>
-              ) : ''}
+
+
+              {/* {this.props.auth.user.occupation === 'subadmin' ? (
+                <Link
+                  to={`/subadmin/order-complete-form/${order._id}`}
+                  className="btn btn-primary"
+                >
+                  Заполнить форму выполнения заново
+                </Link>
+              ) : ''} */}
+
+              {/* {this.props.auth.user.occupation === 'disinfector' ? (
+              <Link
+                to={`/order-complete-form/${order._id}`}
+                className="btn btn-primary"
+              >
+                Заполнить форму выполнения заново
+                </Link>
+               ) : ''} */}
             </ul>
           </div>
         </div>
@@ -135,7 +194,7 @@ class ReturnedQueries extends Component {
       <div className="container-fluid">
         <div className="row">
           <div className="col-12">
-            <h2 className="text-center pl-3 pr-3">Ваши Запросы, которые админ отправил назад для повторного заполнения формы </h2>
+            <h3 className="text-center pl-3 pr-3">Ваши Запросы, которые админ отправил назад для повторного заполнения формы </h3>
           </div>
         </div>
 
@@ -145,14 +204,14 @@ class ReturnedQueries extends Component {
               <Spinner />
             </div>
           ) : (
-              <React.Fragment>
-                {this.state.queries.length === 0 ? (
-                  <div className="col-12">
-                    <h2 className="text-center pl-3 pr-3">Нет Запросов</h2>
-                  </div>
-                ) : renderQueries}
-              </React.Fragment>
-            )}
+            <React.Fragment>
+              {this.state.queries.length === 0 ? (
+                <div className="col-12">
+                  <h3 className="text-center pl-3 pr-3">Нет Запросов</h3>
+                </div>
+              ) : renderQueries}
+            </React.Fragment>
+          )}
         </div>
       </div>
     )

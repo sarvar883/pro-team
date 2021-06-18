@@ -12,7 +12,13 @@ import {
   SET_SEARCH_ORDER_METHOD,
   GET_REPEAT_ORDER_FORM,
   GET_COMPLETE_ORDERS_IN_MONTH,
-  SET_COMP_ORDER_METHOD_INPUT
+  SET_COMP_ORDER_METHOD_INPUT,
+
+  GET_SORTED_ORDERS_ADMIN,
+  GET_SORTED_ORDERS,
+  GET_SORTED_ORDERS_SUBADMIN,
+
+  // ADD_ORDER
 } from './types';
 
 
@@ -37,7 +43,14 @@ export const getCorporateClients = () => (dispatch) => {
 // get all users
 export const getAllUsers = () => (dispatch) => {
   dispatch(setLoading());
-  axios.post('/order/get-all-users')
+
+  const object = {
+    method: 'all',
+    roles: []
+  };
+
+  // axios.post('/order/get-all-users')
+  axios.post('/get-users', { object })
     .then(res =>
       dispatch({
         type: GET_ALL_USERS,
@@ -53,11 +66,17 @@ export const getAllUsers = () => (dispatch) => {
 }
 
 
-// get all disinfectors
+// get disinfectors and subadmins
 export const getDisinfectors = () => (dispatch) => {
   dispatch(setLoading());
-  axios
-    .get('/order/get-all-disinfectors')
+
+  const object = {
+    method: 'role',
+    roles: ['disinfector', 'subadmin']
+  };
+
+  // axios.get('/order/get-all-disinfectors')
+  axios.post('/get-users', { object })
     .then(res => {
       dispatch({
         type: GET_DISINFECTORS,
@@ -76,7 +95,10 @@ export const getDisinfectors = () => (dispatch) => {
 // create new order
 export const createOrder = (newOrder, history, occupation) => (dispatch) => {
   axios.post('/order/create-order', newOrder)
-    .then(res => history.push(`/${occupation}`))
+    .then(res => {
+      // clearSortedOrders(dispatch);
+      return history.push(`/${occupation}`);
+    })
     .catch(err =>
       dispatch({
         type: GET_ERRORS,
@@ -103,6 +125,7 @@ export const getRepeatOrderForm = (id) => (dispatch) => {
       })
     );
 };
+
 
 export const createRepeatOrder = (order, history, occupation) => (dispatch) => {
   axios.post('/order/create-repeat-order', { order: order })
@@ -138,7 +161,10 @@ export const getOrderForEdit = (id) => (dispatch) => {
 // edit order
 export const editOrder = (order, history, occupation) => (dispatch) => {
   axios.post('/order/edit', { order: order })
-    .then(res => history.push(`/${occupation}`))
+    .then(res => {
+      // clearSortedOrders(dispatch);
+      return history.push(`/${occupation}`);
+    })
     .catch(err =>
       dispatch({
         type: GET_ERRORS,
@@ -151,7 +177,10 @@ export const editOrder = (order, history, occupation) => (dispatch) => {
 // delete order
 export const deleteOrder = (object, history, occupation) => (dispatch) => {
   axios.post('/order/delete-order', { object: object })
-    .then(result => history.push(`/${occupation}`))
+    .then(result => {
+      // clearSortedOrders(dispatch);
+      return history.push(`/${occupation}`);
+    })
     .catch(err =>
       dispatch({
         type: GET_ERRORS,
@@ -279,6 +308,28 @@ export const setSearchOrderMethod = (object) => {
     type: SET_SEARCH_ORDER_METHOD,
     payload: object
   };
+};
+
+
+// when new order is created/edited/deleted, admin/operator/subadmin get redirected to their calendar page. In that page, we have to load sortedOrders again, because we want to see changes (changes = created/edited/deleted order) right away. To load sortedOrders again, we have set the sortedOrders field in reducer to empty array
+export const clearSortedOrders = (dispatch) => {
+  // for admin
+  dispatch({
+    type: GET_SORTED_ORDERS_ADMIN,
+    payload: []
+  });
+
+  //  for operator
+  dispatch({
+    type: GET_SORTED_ORDERS,
+    payload: []
+  });
+
+  // for subadmin
+  dispatch({
+    type: GET_SORTED_ORDERS_SUBADMIN,
+    payload: []
+  });
 };
 
 

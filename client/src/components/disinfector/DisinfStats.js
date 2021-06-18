@@ -50,6 +50,7 @@ class DisinfStats extends Component {
     };
 
     this.props.getDisinfectorStats(object);
+    // this.props.getMonthStats(this.props.auth.user.id, this.state.month, this.state.year);
 
     this.setState({
       headingMonth: this.state.month,
@@ -83,12 +84,12 @@ class DisinfStats extends Component {
     };
 
     this.props.getDisinfectorStats(object);
+    // this.props.getDayStats(object);
 
     this.setState({
       headingDay: this.state.day.split('-').reverse().join('-')
     });
   }
-
 
 
   // weekly calendar
@@ -100,6 +101,7 @@ class DisinfStats extends Component {
     };
 
     this.props.getDisinfectorStats(object);
+    // this.props.getWeekStats(this.props.auth.user.id, getWeekDays(getWeekRange(date).from));
 
     this.setState({
       selectedDays: getWeekDays(getWeekRange(date).from)
@@ -126,13 +128,13 @@ class DisinfStats extends Component {
     };
 
     this.props.getDisinfectorStats(object);
+    // this.props.getWeekStats(this.props.auth.user.id, getWeekDays(getWeekRange(days[0]).from));
 
     this.setState({
       selectedDays: getWeekDays(getWeekRange(days[0]).from)
     });
   };
   // end of weekly calendar
-
 
 
   render() {
@@ -166,7 +168,13 @@ class DisinfStats extends Component {
 
 
     return (
-      <div className="container-fluid" >
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-12">
+            <h2 className="text-center">Ваша статистика</h2>
+          </div>
+        </div>
+
         <div className="row">
           <div className="col-lg-4 col-md-6 mt-3">
             <form onSubmit={this.getMonthStats} className="form-bg p-2">
@@ -183,7 +191,7 @@ class DisinfStats extends Component {
                   {monthOptions}
                 </select>
               </div>
-              <button type="submit" className="btn btn-success mr-1 mt-1">Искать</button>
+              <button type="submit" className="btn btn-success mr-1 mt-1"><i className="fas fa-search"></i> Искать</button>
 
               <button type="button" className="btn btn-danger mr-1 mt-1" onClick={() => this.getSpecificMonthStats('current')}>Этот месяц</button>
 
@@ -198,7 +206,7 @@ class DisinfStats extends Component {
                 <label htmlFor="day"><strong>Выберите День:</strong></label>
                 <input type="date" name="day" className="form-control" onChange={this.onChange} required />
               </div>
-              <button type="submit" className="btn btn-primary">Искать</button>
+              <button type="submit" className="btn btn-primary"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 

@@ -12,6 +12,7 @@ import {
 } from '../../actions/adminActions';
 import monthsNames from '../common/monthNames';
 import getMonthAndYearLabels from '../../utils/monthAndYearLabels';
+import returnMonthAndYear from '../../utils/returnMonthAndYear';
 
 
 import { getWeekDays, getWeekRange } from '../common/weekFunc';
@@ -50,6 +51,11 @@ class DisStats extends Component {
   }
 
   onChange = (e) => this.setState({ [e.target.name]: e.target.value });
+
+  setSpecificMonth = (param) => {
+    const { month, year } = returnMonthAndYear(param);
+    this.setState({ month, year });
+  }
 
   getMonthStats = (e) => {
     e.preventDefault();
@@ -172,7 +178,6 @@ class DisStats extends Component {
     );
 
 
-
     // weekly calender
     const { hoverRange, selectedDays } = this.state;
 
@@ -192,7 +197,6 @@ class DisStats extends Component {
     // end of calendar
 
 
-
     return (
       <div className="container-fluid" >
         <div className="row">
@@ -207,17 +211,21 @@ class DisStats extends Component {
               </div>
               <div className="form-group">
                 <label htmlFor="year"><strong>Выберите Год:</strong></label>
-                <select name="year" className="form-control" onChange={this.onChange} required>
+                <select name="year" className="form-control" onChange={this.onChange} value={this.state.year} required>
                   {yearsOptions}
                 </select>
               </div>
               <div className="form-group">
                 <label htmlFor="month"><strong>Выберите Месяц:</strong></label>
-                <select name="month" className="form-control" onChange={this.onChange} required>
+                <select name="month" className="form-control" onChange={this.onChange} value={this.state.month} required>
                   {monthOptions}
                 </select>
               </div>
-              <button type="submit" className="btn btn-success">Искать</button>
+              <button type="submit" className="btn btn-success mr-1 mt-1"><i className="fas fa-search"></i> Искать</button>
+
+              <button type="button" className="btn btn-danger mr-1 mt-1" onClick={() => this.setSpecificMonth('current')}>Этот месяц</button>
+
+              <button type="button" className="btn btn-primary mr-1 mt-1" onClick={() => this.setSpecificMonth('previous')}>Прошлый месяц</button>
             </form>
           </div>
 
@@ -234,7 +242,7 @@ class DisStats extends Component {
                 <label htmlFor="day"><strong>Выберите День:</strong></label>
                 <input type="date" name="day" className="form-control" onChange={this.onChange} required />
               </div>
-              <button type="submit" className="btn btn-primary">Искать</button>
+              <button type="submit" className="btn btn-primary"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
 
@@ -260,7 +268,7 @@ class DisStats extends Component {
                   {renderDisinfectorOptions}
                 </select>
               </div>
-              <button type="submit" className="btn btn-success">Искать</button>
+              <button type="submit" className="btn btn-success"><i className="fas fa-search"></i> Искать</button>
             </form>
           </div>
         </div>
@@ -297,9 +305,6 @@ const mapStateToProps = (state) => ({
 
 export default connect(mapStateToProps, {
   getAllDisinfectorsAndSubadmins,
-  // getDisinfStatsDayForAdmin, 
-  // getDisinfStatsWeekForAdmin, 
-  // getDisinfStatsMonthForAdmin,
   getDisinfectorStatsForAdmin,
   clearStatsData
 })(withRouter(DisStats));

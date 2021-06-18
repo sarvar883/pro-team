@@ -11,6 +11,7 @@ import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
 import { getFailOrderById, setFailedOrder, createOrderAfterFail } from '../../actions/failActions';
 import { getAllUsers } from '../../actions/orderActions';
 
+
 class FailAddNew extends Component {
   state = {
     date: '',
@@ -24,6 +25,8 @@ class FailAddNew extends Component {
   componentDidMount() {
     this.props.getAllUsers();
     window.scrollTo({ top: 0 });
+
+    // console.log('fail', this.props.location.state);
 
     // in some cases, we should load order because the fields userCreated, userAcceptedOrder, disinfectors.user should be populated
     // if we come to this page from /search-orders, these fields would not be populated
@@ -52,7 +55,7 @@ class FailAddNew extends Component {
 
       array.forEach(item => {
         arraySelectedItems.forEach(element => {
-          if (item.type === element) {
+          if (item.type === element.trim()) {
             item.selected = true;
           }
         });
@@ -195,9 +198,39 @@ class FailAddNew extends Component {
               <div className="card order mt-2">
                 <div className="card-body p-0">
                   <ul className="font-bold mb-0 list-unstyled">
+                    {order.prevFailedOrder && (
+                      <li><h4><i className="fas fas fa-exclamation"></i> Повторный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                    )}
+
+                    {order.failed && (
+                      <li><h4><i className="fas fas fa-exclamation"></i> Некачественный заказ <i className="fas fas fa-exclamation"></i></h4></li>
+                    )}
+
                     {order.disinfectorId ? (
                       <li>Ответственный: {order.disinfectorId.occupation} {order.disinfectorId.name}</li>
                     ) : ''}
+
+
+                    {order.failed && order.nextOrdersAfterFailArray && (
+                      <React.Fragment>
+                        <li className="text-primary">Повторов у этого заказа: {order.nextOrdersAfterFailArray.length}</li>
+
+                        {order.nextOrdersAfterFailArray.length > 0 && (
+                          <React.Fragment>
+                            <li className="text-primary">Время последнего заказа: <Moment format="DD/MM/YYYY HH:mm">{order.nextOrdersAfterFailArray[order.nextOrdersAfterFailArray.length - 1].dateFrom}</Moment></li>
+
+                            <li className="text-primary">Выполняет последний заказ: {order.nextOrdersAfterFailArray[order.nextOrdersAfterFailArray.length - 1].disinfectorId.occupation} {order.nextOrdersAfterFailArray[order.nextOrdersAfterFailArray.length - 1].disinfectorId.name}</li>
+                          </React.Fragment>
+                        )}
+                      </React.Fragment>
+                    )}
+
+
+                    {order.prevFailedOrder && order.prevFailedOrder.disinfectorId && (
+                      <li className="text-primary">Предыдущий некачественный заказ: <Moment format="DD/MM/YYYY HH:mm">{order.prevFailedOrder.dateFrom}</Moment> ({order.prevFailedOrder.disinfectorId.occupation} {order.prevFailedOrder.disinfectorId.name})</li>
+                    )}
+
+
 
                     {order.completed ? (
                       <li>Заказ Выполнен</li>
@@ -211,6 +244,14 @@ class FailAddNew extends Component {
                         <li>Отзыв Клиента: {order.clientReview}</li>
                       </React.Fragment>
                     ) : <li>Оператор еще не рассмотрел заявку</li>}
+
+
+
+
+
+
+
+
 
                     {order.accountantDecided ? (
                       <React.Fragment>
@@ -239,6 +280,51 @@ class FailAddNew extends Component {
 
                       </React.Fragment>
                     )}
+
+                    {/* {order.clientType === 'corporate' && order.paymentMethod === 'notCash' && !order.accountantDecided ? <li>Бухгалтер еще не рассмотрел заявку</li> : ''}
+
+                    {order.clientType === 'corporate' && order.paymentMethod === 'notCash' && order.accountantDecided ?
+                      <React.Fragment>
+                        <li>Бухгалтер рассмотрел заявку</li>
+                        {order.accountantConfirmed ? (
+                          <React.Fragment>
+                            <li className="text-success">Бухгалтер Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{order.accountantCheckedAt}</Moment>)</li>
+                            <li>Счет-Фактура: {order.invoice}</li>
+                            <li>Общая Сумма: {order.cost.toLocaleString()} (каждому по {(order.cost / order.disinfectors.length).toLocaleString()})</li>
+                          </React.Fragment>
+                        ) : <li className="text-danger">Бухгалтер Отклонил (<Moment format="DD/MM/YYYY HH:mm">{order.accountantCheckedAt}</Moment>)</li>}
+                      </React.Fragment>
+                      : ''}
+
+                    {order.clientType === 'corporate' && order.paymentMethod === 'cash' && !order.adminDecided ? <li>Админ еще не рассмотрел заявку</li> : ''}
+
+                    {order.clientType === 'corporate' && order.paymentMethod === 'cash' && order.adminDecided ? (
+                      <React.Fragment>
+                        <li>Админ рассмотрел заявку</li>
+                        {order.adminConfirmed ? (
+                          <li className="text-success">Админ Подтвердил (<Moment format="DD/MM/YYYY HH:mm">{order.adminCheckedAt}</Moment>)</li>
+                        ) : <li className="text-danger">Админ Отклонил (<Moment format="DD/MM/YYYY HH:mm">{order.adminCheckedAt}</Moment>)</li>}
+                      </React.Fragment>
+                    ) : ''}
+
+                    {order.clientType === 'individual' ? (
+                      <React.Fragment>
+                        {order.completed && order.adminDecided ? (
+                          <React.Fragment>
+                            <li>Админ рассмотрел заявку (время: <Moment format="DD/MM/YYYY HH:mm">{order.adminCheckedAt}</Moment>)</li>
+                            {order.adminConfirmed ? <li className="text-success">Админ подтвердил заяку</li> : <li className="text-danger">Админ отверг заяку</li>}
+                          </React.Fragment>
+                        ) : <li>Админ еще не рассмотрел заявку</li>}
+                      </React.Fragment>
+                    ) : ''} */}
+
+
+
+
+
+
+
+
 
                     {order.clientType === 'corporate' ?
                       <React.Fragment>
@@ -278,7 +364,7 @@ class FailAddNew extends Component {
                         ) : (
                           <React.Fragment>
                             <li>Тип Платежа: Безналичный</li>
-                            <li>Номер Договора: {order.contractNumber}</li>
+                            <li>Номер Договора: {order.contractNumber || '--'}</li>
                           </React.Fragment>
                         )}
                       </React.Fragment>
@@ -352,7 +438,7 @@ class FailAddNew extends Component {
                       onChange={this.onChange}
                       error={errors.comment}
                     />
-                    <button type="submit" className="btn btn-success" >Создать</button>
+                    <button type="submit" className="btn btn-success">Создать</button>
                   </form>
                 </div>
               </div>

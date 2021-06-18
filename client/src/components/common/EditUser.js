@@ -119,7 +119,7 @@ class EditUser extends Component {
       { label: 'Субадмин', value: 'subadmin' },
       { label: 'Оператор', value: 'operator' },
       { label: 'Дезинфектор', value: 'disinfector' },
-      { label: 'Маркетолог', value: 'marketer' },
+      // { label: 'Маркетолог', value: 'marketer' },
       { label: 'Бухгалтер', value: 'accountant' }
     ];
 
@@ -155,7 +155,7 @@ class EditUser extends Component {
               <li>Должность: {this.state.occupation}</li>
               <li>Цвет (в календаре): {this.state.color ? this.state.color : '--'}</li>
               <li>Дата Рождения: {this.state.birthday ? <Moment format="DD/MM/YYYY">{this.state.birthday}</Moment> : '--'}</li>
-              {}
+              { }
               <li>Женат / Замужем ? {this.state.married === 'yes' ? 'Да' : 'Нет'}</li>
               <li>Есть ли дети ? {this.state.hasChildren === 'yes' ? 'Да' : 'Нет'}</li>
               {this.state.hasChildren === 'yes' ? <li>Количество детей: {this.state.children}</li> : ''}
@@ -237,7 +237,7 @@ class EditUser extends Component {
                       <input type="number" name="children" step="1" min="1" className="form-control" onChange={this.onChange} value={this.state.children} required />
                     </div>
                   ) : ''}
-                  <button type="submit" className="btn btn-primary">Редактировать</button>
+                  <button type="submit" className="btn btn-primary"><i className="fas fa-user-edit"></i> Редактировать</button>
                 </form>
               </div>
             </div>

@@ -79,7 +79,7 @@ class Login extends Component {
                     error={errors.password}
                   />
 
-                  <button type="submit" className="btn btn-primary">Login</button>
+                  <button type="submit" className="btn btn-primary"><i className="fas fa-sign-in-alt"></i> Login</button>
                 </form>
 
               </div>

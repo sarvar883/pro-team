@@ -38,12 +38,14 @@ import Users from './components/common/Users';
 import EditUser from './components/common/EditUser';
 import ClientList from './components/admin/ClientList';
 import ClientId from './components/admin/ClientId';
+import SetDisinfectorMaterials from './components/common/SetDisinfectorMaterials';
+import SetCurrentMaterials from './components/admin/SetCurrentMaterials';
 
 import NewMaterial from './components/common/NewMaterial';
 
 import Subadmin from './components/subadmin/Subadmin';
 import SubadmOrders from './components/subadmin/SubadmOrders';
-import SubOrderForm from './components/subadmin/SubOrderForm';
+// import SubOrderForm from './components/subadmin/SubOrderForm';
 import MaterialDistrib from './components/subadmin/MaterialDistrib';
 import SubMatComHist from './components/subadmin/SubMatComHist';
 import MatDistribHistory from './components/subadmin/MatDistribHistory';
@@ -165,16 +167,16 @@ class App extends Component {
               <AdminRoute exact path="/register" component={Register} />
             </Switch>
             <Switch>
-              <AdminRoute exact path="/admin/stats" component={AdminStats} />
+              <PrivateRoute exact path="/admin/stats" component={AdminStats} />
             </Switch>
             <Switch>
-              <AdminRoute exact path="/admin/adv-stats" component={AdvStats} />
+              <PrivateRoute exact path="/admin/adv-stats" component={AdvStats} />
             </Switch>
             <Switch>
-              <AdminRoute exact path="/admin/disinf-stats" component={DisStats} />
+              <PrivateRoute exact path="/admin/disinf-stats" component={DisStats} />
             </Switch>
             <Switch>
-              <AdminRoute exact path="/admin/operator-stats" component={OperStats} />
+              <PrivateRoute exact path="/admin/operator-stats" component={OperStats} />
             </Switch>
             <Switch>
               <AdminRoute exact path="/admin/order-queries" component={AdminQueries} />
@@ -222,6 +224,14 @@ class App extends Component {
               <AdminRoute exact path="/admin/new/mat" component={NewMaterial} />
             </Switch>
 
+            <Switch>
+              <AdminRoute exact path="/admin/set-disinfector-materials/:id" component={SetDisinfectorMaterials} />
+            </Switch>
+            <Switch>
+              <AdminRoute exact path="/admin/set-current-materials" component={SetCurrentMaterials} />
+            </Switch>
+
+
             {/* Subadmin Routes */}
             <Switch>
               <SubadminRoute exact path="/subadmin" component={Subadmin} />
@@ -235,9 +245,9 @@ class App extends Component {
             <Switch>
               <SubadminRoute exact path="/subadmin/stats" component={DisinfStats} />
             </Switch>
-            <Switch>
+            {/* <Switch>
               <SubadminRoute exact path="/subadmin/order-complete-form/:id" component={SubOrderForm} />
-            </Switch>
+            </Switch> */}
             <Switch>
               <SubadminRoute exact path="/subadmin/materials" component={MaterialDistrib} />
             </Switch>
@@ -254,7 +264,8 @@ class App extends Component {
               <DisinfectorRoute exact path="/disinfector" component={Disinfector} />
             </Switch>
             <Switch>
-              <DisinfectorRoute exact path="/order-complete-form/:id" component={OrderComplete} />
+              {/* <DisinfectorRoute exact path="/order-complete-form/:id" component={OrderComplete} /> */}
+              <PrivateRoute exact path="/order-complete-form/:id" component={OrderComplete} />
             </Switch>
             <Switch>
               <DisinfectorRoute exact path="/disinfector/queries" component={DisinfQueries} />

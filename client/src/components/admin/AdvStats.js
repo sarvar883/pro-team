@@ -8,7 +8,7 @@ import { getAdvStats } from '../../actions/adminActions';
 import monthsNames from '../common/monthNames';
 import getMonthAndYearLabels from '../../utils/monthAndYearLabels';
 import returnMonthAndYear from '../../utils/returnMonthAndYear';
-
+import calculateDisinfScore from '../../utils/calcDisinfScore';
 
 class AdvStats extends Component {
   state = {
@@ -122,70 +122,109 @@ class AdvStats extends Component {
       advArray.push({
         name: item.value,
         quantity: 0,
-        orders: [],
+        // orders: [],
         completed: 0,
         confirmed: 0,
         rejected: 0,
         failed: 0,
+        povtors: 0,
         totalSum: 0,
         totalScore: 0
       });
     });
 
-    if (this.state.orders) {
-      this.state.orders.forEach(order => {
-        advArray.forEach(item => {
-          if (order.advertising === item.name) {
-            item.quantity++;
-            item.orders.push(order);
+    this.state.orders.forEach(order => {
+      advArray.forEach(item => {
+        if (order.advertising === item.name) {
+          item.quantity++;
+          // item.orders.push(order);
 
-            if (order.completed) {
-              item.completed++;
-
-              if (order.clientType === 'corporate') {
-                if (order.completed && order.operatorConfirmed && order.accountantConfirmed) {
-                  item.confirmed++;
-                  item.totalSum += order.cost;
-                  item.totalScore += order.score;
-                }
-
-                // if (!order.operatorConfirmed || !order.accountantConfirmed) {
-                if (order.completed && ((order.operatorDecided && !order.operatorConfirmed) || (order.accountantDecided && !order.accountantConfirmed))) {
-                  item.rejected++;
-                }
-
-              }
-
-              if (order.clientType === 'individual') {
-                if (order.completed && order.operatorConfirmed && order.adminConfirmed) {
-                  item.confirmed++;
-                  item.totalSum += order.cost;
-                  item.totalScore += order.score;
-                }
-
-                // if (!order.operatorConfirmed || !order.adminConfirmed) {
-                if (order.completed &&
-                  (
-                    (order.operatorDecided && !order.operatorConfirmed) ||
-                    (order.adminDecided && !order.adminConfirmed)
-                  )
-                ) {
-                  item.rejected++;
-                }
-
-                if (order.failed) {
-                  item.failed++;
-                }
-              }
-            }
+          if (order.hasOwnProperty('prevFailedOrder')) {
+            item.povtors++;
           }
-        });
+
+          if (order.completed) {
+            item.completed++;
+
+            // if order was confirmed
+            if (
+              !order.failed &&
+              // исключаем некачественные и повторные заказы
+              !order.hasOwnProperty('prevFailedOrder') &&
+              order.operatorConfirmed &&
+              (order.accountantConfirmed || order.adminConfirmed)
+            ) {
+              item.confirmed++;
+              item.totalSum += order.cost;
+              item.totalScore += order.score;
+            }
+
+            // if order was rejected
+            if (
+              (order.operatorDecided && !order.operatorConfirmed) ||
+              (order.accountantDecided && !order.accountantConfirmed) ||
+              (order.adminDecided && !order.adminConfirmed)
+            ) {
+              item.rejected++;
+            }
+
+            // if order was failed
+            if (order.failed) {
+              item.failed++;
+            }
+
+            // if (order.clientType === 'corporate') {
+            //   if (order.completed && order.operatorConfirmed && order.accountantConfirmed) {
+            //     item.confirmed++;
+            //     item.totalSum += order.cost;
+            //     item.totalScore += order.score;
+            //   }
+
+            //   // if (!order.operatorConfirmed || !order.accountantConfirmed) {
+            //   if (order.completed && ((order.operatorDecided && !order.operatorConfirmed) || (order.accountantDecided && !order.accountantConfirmed))) {
+            //     item.rejected++;
+            //   }
+
+            // }
+
+            // if (order.clientType === 'individual') {
+            //   if (order.completed && order.operatorConfirmed && order.adminConfirmed) {
+            //     item.confirmed++;
+            //     item.totalSum += order.cost;
+            //     item.totalScore += order.score;
+            //   }
+
+            //   // if (!order.operatorConfirmed || !order.adminConfirmed) {
+            //   if (order.completed &&
+            //     (
+            //       (order.operatorDecided && !order.operatorConfirmed) ||
+            //       (order.adminDecided && !order.adminConfirmed)
+            //     )
+            //   ) {
+            //     item.rejected++;
+            //   }
+
+            //   if (order.failed) {
+            //     item.failed++;
+            //   }
+            // }
+
+
+          }
+        }
       });
-    }
+    });
 
     advArray.sort((a, b) => b.quantity - a.quantity);
 
     let renderAdvGeneral = advArray.map((item, index) => {
+      // calculate average score using new formula 
+      const averageScore = calculateDisinfScore({
+        totalScore: item.totalScore,
+        totalOrders: item.confirmed,
+        failedOrders: item.failed
+      }) || 0;
+
       return (
         <div className="col-lg-4 col-md-6 mt-3" key={index}>
           <div className="card order mt-2">
@@ -195,10 +234,15 @@ class AdvStats extends Component {
                 <li>Получено заказов: {item.quantity}</li>
                 <li>Выполнено заказов: {item.completed}</li>
                 <li>Подтверждено заказов: {item.confirmed}</li>
-                <li>На общую сумму: {item.totalSum.toLocaleString()} UZS</li>
-                <li>Средний балл: {(item.totalScore / item.confirmed).toFixed(2)} (из 5)</li>
+
+                <li className="pt-2">На общую сумму: {item.totalSum.toLocaleString()} UZS</li>
+                <li className="pb-2">Средний балл: {averageScore.toFixed(2)} (из 5)</li>
+
                 <li>Отвергнуто заказов: {item.rejected}</li>
                 <li>Некачественные заказы: {item.failed}</li>
+                <li>Повторные заказы: {item.povtors}</li>
+
+                <h6 className="mt-2">* некачественные и повторные заказы не входят в подтвержденные заказы и общую сумму</h6>
               </ul>
             </div>
           </div>
@@ -209,7 +253,7 @@ class AdvStats extends Component {
     return (
       <div className="container-fluid mt-1 p-0">
         <div className="row m-0 p-0">
-          <div className="col-lg-5 col-md-7">
+          <div className="col-lg-4 col-md-6">
             <form onSubmit={this.getMonthStats} className="form-bg p-2">
               <div className="form-group">
                 <select name="year" className="form-control" onChange={this.onChange} required>
@@ -221,13 +265,28 @@ class AdvStats extends Component {
                   {monthOptions}
                 </select>
               </div>
-              <button type="submit" className="btn btn-success mr-1 mt-1">Показать</button>
+              <button type="submit" className="btn btn-success mr-1 mt-1"><i className="fas fa-search"></i> Показать</button>
 
               <button type="button" className="btn btn-danger mr-1 mt-1" onClick={() => this.getSpecificMonthStats('current')}>Этот месяц</button>
 
               <button type="button" className="btn btn-primary mr-1 mt-1" onClick={() => this.getSpecificMonthStats('previous')} >Прошлый месяц</button>
             </form>
           </div>
+
+          {/* <div className="col-lg-4 col-md-6 mt-3">
+            <form onSubmit={this.getYearStats} className="form-bg p-2">
+              <div className="form-group">
+                <select name="year" className="form-control" onChange={this.onChange} required>
+                  {yearsOptions}
+                </select>
+              </div>
+              <button type="submit" className="btn btn-block btn-info">Показать годовую статистику</button>
+            </form>
+          </div> */}
+
+          {/* <div className="col-lg-4 col-md-6 mt-3">
+            <button onClick={this.allTimeStats} className="btn btn-block btn-dark">Показать статистику за все время</button>
+          </div> */}
         </div>
 
         <div className="row m-0">

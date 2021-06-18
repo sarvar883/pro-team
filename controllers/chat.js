@@ -5,11 +5,11 @@ const Anons = require('../models/anons');
 const io = require('../socket');
 
 
-exports.getAllUsers = (req, res) => {
-  User.find({ disabled: false })
-    .then(users => res.json(users))
-    .catch(err => console.log('getAllUsers ERROR', err));
-};
+// exports.getAllUsers = (req, res) => {
+//   User.find({ disabled: false })
+//     .then(users => res.json(users))
+//     .catch(err => console.log('getAllUsers ERROR', err));
+// };
 
 
 // get chats of logged in user

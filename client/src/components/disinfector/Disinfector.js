@@ -24,7 +24,7 @@ class Disinfector extends Component {
       <React.Fragment>
         <div className="container">
           <div className="row">
-            <div className="col-12">
+            <div className="col-12 mt-2">
               <h2 className="text-center">Страница Дезинфектора {this.props.auth.user.name}</h2>
             </div>
           </div>

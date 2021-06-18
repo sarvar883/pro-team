@@ -38,7 +38,7 @@ import {
 
   CLEAR_STATS_DATA_ADMIN,
   DELETE_QUERY_FROM_STATE,
-  REMOVE_DISABLED_USER_FROM_DOM
+  REMOVE_DISABLED_USER_FROM_DOM,
 } from '../actions/types';
 
 const initialState = {
@@ -367,6 +367,8 @@ export default function (state = initialState, action) {
     case CLEAR_STATS_DATA_ADMIN:
       return {
         ...state,
+        method: '',
+        loadingStats: false,
         stats: {
           ...state.stats,
           disinfectorId: '',
