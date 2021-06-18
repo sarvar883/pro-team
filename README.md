@@ -5,7 +5,7 @@ Sample users:
 
 Admin
 login: admin@gmail.com
-password: admin
+password: admin12
 
 Operator
 login: operator@gmail.com
